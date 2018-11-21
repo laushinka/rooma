@@ -12,19 +12,18 @@ public class Craigslist implements Source{
     public String fetch(String url) {
         Document doc = null;
         try {
-            doc = Jsoup.connect("https://berlin.craigslist.de/d/flats-housing-for-rent/search/apa?lang=en&cc=gb").get();
+            doc = Jsoup.connect("https://berlin.craigslist.de/search/apa?lang=en&cc=gb").get();
         } catch (IOException e) {
             e.printStackTrace();
         }
         Elements listOfResults = doc.select("li.result-row");
         StringBuffer sb = new StringBuffer();
         for (Element result : listOfResults) {
-            String temp = String.format("%s\n\t%s\t%s\t%s\t%s",
+            String temp = String.format("%s\t%s\t%s\t%s\t%s\n",
                     result.getElementsByClass("result-title").text(),
                     result.getElementsByClass("result-price").text(),
                     result.getElementsByClass("housing").text(),
-                    result.getElementsByClass("result-hood").text(),
-                    result.absUrl("href"));
+                    result.getElementsByClass("result-hood").text());
             sb.append(temp);
         }
         return sb.toString();
