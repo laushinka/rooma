@@ -3,6 +3,8 @@ package com.rooma.scraper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.List;
+
 @SpringBootApplication
 public class ScraperApplication {
 
@@ -15,8 +17,8 @@ public class ScraperApplication {
 		}
 
 		Source src = SourceFactory.create(args[0]);
-		String result = src.fetch("");
-		log(result);
+		List<ListingDTO> result = src.fetch("");
+		for (ListingDTO listing: result) log(listing.getTitle());
 	}
 
 	private static void log(String message, String... values) {

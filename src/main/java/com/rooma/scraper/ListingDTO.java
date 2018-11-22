@@ -8,11 +8,9 @@ import lombok.Getter;
 public class ListingDTO {
     private String title;
     private String district;
-    private Integer minimumArea;
-    private Integer maximumArea;
-    private Double minimumPrice;
-    private Double maximumPrice;
-    private Integer minimumNumberOfRooms;
+    private String area;
+    private String price;
+    private String numberOfRooms;
     private String url;
     private String imageUrl;
 }
