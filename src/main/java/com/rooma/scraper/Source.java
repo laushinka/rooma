@@ -1,5 +1,7 @@
 package com.rooma.scraper;
 
+import java.util.List;
+
 public interface Source {
-    String fetch(String url);
+    List<ListingDTO> fetch(String url);
 }
