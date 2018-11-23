@@ -63,10 +63,11 @@ public class Craigslist implements Source{
 
         if (!area.equals("")) {
             String trimSpaces = area.replaceAll("\\s", "");
-            if (trimSpaces.split("br-").length > 0 && trimSpaces.split("br-").length > 1) {
-                areaSplit = trimSpaces.split("br-")[1];
+            String[] tokens = trimSpaces.split("br-");
+            if (tokens.length > 1) {
+                areaSplit = tokens[1];
             } else {
-                areaSplit = trimSpaces.split("br-")[0];
+                areaSplit = tokens[0];
             }
             return areaSplit.trim().split("m")[0];
         }
