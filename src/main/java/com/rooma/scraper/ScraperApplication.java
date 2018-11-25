@@ -18,7 +18,13 @@ public class ScraperApplication {
 
 		Source src = SourceFactory.create(args[0]);
 		List<ListingDTO> result = src.fetch("");
-		for (ListingDTO listing: result) log(listing.getTitle());
+		for (ListingDTO listing: result) {
+			try {
+				log(listing.getTitle());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private static void log(String message, String... values) {

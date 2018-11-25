@@ -9,31 +9,42 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Craigslist implements Source{
+public class Craigslist implements Source {
     @Override
     public List<ListingDTO> fetch(String url) {
-        Document doc = null;
+        Document document;
+        List<Document> listOfDocuments = new ArrayList<>();
+        ListingDTO dto;
+        List<ListingDTO> listingDTOList = new ArrayList<>();
         try {
-            doc = Jsoup.connect("https://berlin.craigslist.de/search/apa?lang=en&cc=gb").get();
+            String[] urls = {"https://berlin.craigslist.de/search/apa?lang=en&cc=gb",
+                    "https://berlin.craigslist.de/search/apa?s=120",
+                    "https://berlin.craigslist.de/search/apa?s=240",
+                    "https://berlin.craigslist.de/search/apa?s=360",
+                    "https://berlin.craigslist.de/search/apa?s=480"};
+            for (String page : urls) {
+                document = Jsoup.connect(page).get();
+                listOfDocuments.add(document);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Elements listOfResults = doc.select("li.result-row");
-        ListingDTO dto;
-        List<ListingDTO> listingDTOList = new ArrayList<>();
 
-        for (Element result : listOfResults) {
-            dto = ListingDTO.builder()
-                    .title(result.getElementsByClass("result-title").text())
-                    .district(result.getElementsByClass("result-hood").text())
-                    .area(getArea(result))
-                    .price(getPrice(result))
-                    .numberOfRooms(getNumberOfRooms(result))
-                    .url(result.absUrl("href"))
-                    .imageUrl(result.getElementsByAttribute("img").text())
-                    .build();
+        for (Document doc : listOfDocuments) {
+            Elements listOfResults = doc.select("li.result-row");
+            for (Element result : listOfResults) {
+                dto = ListingDTO.builder()
+                        .title(result.getElementsByClass("result-title").text())
+                        .district(result.getElementsByClass("result-hood").text())
+                        .area(getArea(result))
+                        .price(getPrice(result))
+                        .numberOfRooms(getNumberOfRooms(result))
+                        .url(result.absUrl("href"))
+                        .imageUrl(result.getElementsByAttribute("img").text())
+                        .build();
 
-            listingDTOList.add(dto);
+                listingDTOList.add(dto);
+            }
         }
         return listingDTOList;
     }
