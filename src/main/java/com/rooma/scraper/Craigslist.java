@@ -12,9 +12,7 @@ import java.util.List;
 public class Craigslist implements Source {
     @Override
     public List<ListingDTO> fetch(String url) {
-        Document document;
         List<Document> listOfDocuments = new ArrayList<>();
-        ListingDTO dto;
         List<ListingDTO> listingDTOList = new ArrayList<>();
         try {
             String[] urls = {"https://berlin.craigslist.de/search/apa?lang=en&cc=gb",
@@ -23,8 +21,7 @@ public class Craigslist implements Source {
                     "https://berlin.craigslist.de/search/apa?s=360",
                     "https://berlin.craigslist.de/search/apa?s=480"};
             for (String page : urls) {
-                document = Jsoup.connect(page).get();
-                listOfDocuments.add(document);
+                fetchDocuments(listOfDocuments, page);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -33,20 +30,31 @@ public class Craigslist implements Source {
         for (Document doc : listOfDocuments) {
             Elements listOfResults = doc.select("li.result-row");
             for (Element result : listOfResults) {
-                dto = ListingDTO.builder()
-                        .title(result.getElementsByClass("result-title").text())
-                        .district(result.getElementsByClass("result-hood").text())
-                        .area(getArea(result))
-                        .price(getPrice(result))
-                        .numberOfRooms(getNumberOfRooms(result))
-                        .url(result.absUrl("href"))
-                        .imageUrl(result.getElementsByAttribute("img").text())
-                        .build();
-
-                listingDTOList.add(dto);
+                buildDto(listingDTOList, result);
             }
         }
         return listingDTOList;
+    }
+
+    private void fetchDocuments(List<Document> listOfDocuments, String page) throws IOException {
+        Document document;
+        document = Jsoup.connect(page).get();
+        listOfDocuments.add(document);
+    }
+
+    private void buildDto(List<ListingDTO> listingDTOList, Element result) {
+        ListingDTO dto;
+        dto = ListingDTO.builder()
+                .title(result.getElementsByClass("result-title").text())
+                .district(result.getElementsByClass("result-hood").text())
+                .area(getArea(result))
+                .price(getPrice(result))
+                .numberOfRooms(getNumberOfRooms(result))
+                .url(result.absUrl("href"))
+                .imageUrl(result.getElementsByAttribute("img").text())
+                .build();
+
+        listingDTOList.add(dto);
     }
 
     private String getPrice(Element result) {
