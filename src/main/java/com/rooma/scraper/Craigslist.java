@@ -30,7 +30,8 @@ public class Craigslist implements Source {
         for (Document doc : listOfDocuments) {
             Elements listOfResults = doc.select("li.result-row");
             for (Element result : listOfResults) {
-                buildDto(listingDTOList, result);
+                ListingDTO listingDTO = buildDto(result);
+                listingDTOList.add(listingDTO);
             }
         }
         return listingDTOList;
@@ -42,9 +43,8 @@ public class Craigslist implements Source {
         listOfDocuments.add(document);
     }
 
-    private void buildDto(List<ListingDTO> listingDTOList, Element result) {
-        ListingDTO dto;
-        dto = ListingDTO.builder()
+    private ListingDTO buildDto(Element result) {
+        return ListingDTO.builder()
                 .title(result.getElementsByClass("result-title").text())
                 .district(result.getElementsByClass("result-hood").text())
                 .area(getArea(result))
@@ -53,8 +53,6 @@ public class Craigslist implements Source {
                 .url(result.absUrl("href"))
                 .imageUrl(result.getElementsByAttribute("img").text())
                 .build();
-
-        listingDTOList.add(dto);
     }
 
     private String getPrice(Element result) {
