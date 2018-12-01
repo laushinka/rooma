@@ -20,7 +20,7 @@ public class ScraperApplication {
 		List<ListingDTO> result = src.fetch("");
 		for (ListingDTO listing: result) {
 			try {
-				log(listing.getTitle());
+				log("%s", listing.getTitle());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
