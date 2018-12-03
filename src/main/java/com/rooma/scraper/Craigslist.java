@@ -12,14 +12,12 @@ import java.util.List;
 public class Craigslist implements Source {
     @Override
     public List<ListingDTO> fetch(String url) {
+        List<String> listOfPages = new ArrayList<>();
         List<Document> listOfDocuments = new ArrayList<>();
         List<ListingDTO> listingDTOList = new ArrayList<>();
+
         try {
-            String[] urls = {"https://berlin.craigslist.de/search/apa?lang=en&cc=gb",
-                    "https://berlin.craigslist.de/search/apa?s=120",
-                    "https://berlin.craigslist.de/search/apa?s=240",
-                    "https://berlin.craigslist.de/search/apa?s=360",
-                    "https://berlin.craigslist.de/search/apa?s=480"};
+            List<String> urls = getUrls(listOfPages);
             for (String page : urls) {
                 fetchDocuments(listOfDocuments, page);
             }
@@ -27,6 +25,12 @@ public class Craigslist implements Source {
             e.printStackTrace();
         }
 
+        processDocuments(listOfDocuments, listingDTOList);
+
+        return listingDTOList;
+    }
+
+    private void processDocuments(List<Document> listOfDocuments, List<ListingDTO> listingDTOList) {
         for (Document doc : listOfDocuments) {
             Elements listOfResults = doc.select("li.result-row");
             for (Element result : listOfResults) {
@@ -34,12 +38,27 @@ public class Craigslist implements Source {
                 listingDTOList.add(listingDTO);
             }
         }
-        return listingDTOList;
+    }
+
+    private List<String> getUrls(List<String> listOfPages) throws IOException {
+        String hostName = "https://berlin.craigslist.de";
+        String firstPage = "https://berlin.craigslist.de/search/apa?lang=en&cc=gb";
+        listOfPages.add(firstPage);
+
+        for (int i = 0; i < 5; i++) {
+            Document firstDoc = Jsoup.connect(listOfPages.get(listOfPages.size() - 1)).get();
+            String nextPage = firstDoc.select("a.button.next").attr("href");
+            if (!nextPage.equals("")) {
+                String nextUrl = hostName + nextPage;
+                listOfPages.add(nextUrl);
+            }
+        }
+
+        return listOfPages;
     }
 
     private void fetchDocuments(List<Document> listOfDocuments, String page) throws IOException {
-        Document document;
-        document = Jsoup.connect(page).get();
+        Document document = Jsoup.connect(page).get();
         listOfDocuments.add(document);
     }
 
