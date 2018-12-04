@@ -66,7 +66,7 @@ public class Craigslist implements Source {
         return ListingDTO.builder()
                 .title(result.getElementsByClass("result-title").text())
                 .district(result.getElementsByClass("result-hood").text())
-                .area(getArea(result))
+                .size(getSize(result))
                 .price(getPrice(result))
                 .numberOfRooms(getNumberOfRooms(result))
                 .url(result.absUrl("href"))
@@ -74,12 +74,12 @@ public class Craigslist implements Source {
                 .build();
     }
 
-    private String getPrice(Element result) {
+    private Float getPrice(Element result) {
         String price = result.getElementsByClass("result-price").text();
         if (!price.equals("")) {
-            return price.split("€")[1];
+            return Float.valueOf(price.split("€")[1]);
         }
-        return "";
+        return 0f;
     }
 
     private String getNumberOfRooms(Element result) {
@@ -93,20 +93,20 @@ public class Craigslist implements Source {
         return "";
     }
 
-    private String getArea(Element result) {
-        String area = result.getElementsByClass("housing").text();
-        String areaSplit;
+    private Float getSize(Element result) {
+        String size = result.getElementsByClass("housing").text();
+        String sizeSplit;
 
-        if (!area.equals("")) {
-            String trimSpaces = area.replaceAll("\\s", "");
+        if (!size.equals("")) {
+            String trimSpaces = size.replaceAll("\\s", "");
             String[] tokens = trimSpaces.split("br-");
             if (tokens.length > 1) {
-                areaSplit = tokens[1];
+                sizeSplit = tokens[1];
             } else {
-                areaSplit = tokens[0];
+                sizeSplit = tokens[0];
             }
-            return areaSplit.trim().split("m")[0];
+            return Float.valueOf(sizeSplit.trim().split("m")[0]);
         }
-        return "";
+        return 0f;
     }
 }
