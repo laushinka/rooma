@@ -1,0 +1,16 @@
+create table listing (
+    RENTAL_TYPE varchar(50),
+    TITLE varchar(50),
+    DISTRICT varchar(50),
+    ADDRESS varchar(50),
+    POSTCODE varchar(50),
+    SIZE DECIMAL(15,2),
+    PRICE DECIMAL(15,2),
+    NUMBER_OF_ROOMS varchar(50),
+    URL varchar(50),
+    IMAGE_URL varchar(50),
+    SOURCE varchar(50),
+    IS_AVAILABLE boolean,
+    CREATION_DATE DateTime,
+    MODIFICATION_DATE DateTime,
+)

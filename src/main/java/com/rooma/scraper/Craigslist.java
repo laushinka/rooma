@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,12 +75,13 @@ public class Craigslist implements Source {
                 .build();
     }
 
-    private Float getPrice(Element result) {
+    private BigDecimal getPrice(Element result) {
         String price = result.getElementsByClass("result-price").text();
         if (!price.equals("")) {
-            return Float.valueOf(price.split("€")[1]);
+            String priceString = price.split("€")[1];
+            return BigDecimal.valueOf(Long.parseLong(priceString));
         }
-        return 0f;
+        return BigDecimal.valueOf(0);
     }
 
     private String getNumberOfRooms(Element result) {
@@ -93,7 +95,7 @@ public class Craigslist implements Source {
         return "";
     }
 
-    private Float getSize(Element result) {
+    private BigDecimal getSize(Element result) {
         String size = result.getElementsByClass("housing").text();
         String sizeSplit;
 
@@ -105,8 +107,9 @@ public class Craigslist implements Source {
             } else {
                 sizeSplit = tokens[0];
             }
-            return Float.valueOf(sizeSplit.trim().split("m")[0]);
+            String sizeString = sizeSplit.trim().split("m")[0];
+            return BigDecimal.valueOf(Long.parseLong(sizeString));
         }
-        return 0f;
+        return BigDecimal.valueOf(0);
     }
 }
