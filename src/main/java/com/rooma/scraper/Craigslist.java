@@ -78,7 +78,7 @@ public class Craigslist implements Source {
     private BigDecimal getPrice(Element result) {
         String price = result.getElementsByClass("result-price").text();
         if (!price.equals("")) {
-            String priceString = price.split("€")[1];
+            String priceString = price.split("€")[1].trim();
             return BigDecimal.valueOf(Long.parseLong(priceString));
         }
         return BigDecimal.valueOf(0);
