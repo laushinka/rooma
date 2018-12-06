@@ -5,10 +5,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class ListingService {
+class ListingService {
     private ListingRepository listingRepository;
 
-    public ListingDTO saveListing(ListingDTO listing) {
+    ListingDTO saveListing(ListingDTO listing) {
         return listingRepository.save(listing);
     }
 }
