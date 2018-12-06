@@ -7,8 +7,7 @@ import java.util.List;
 
 @SpringBootApplication
 public class ScraperApplication {
-	private ListingRepository listingRepository;
-
+	private ListingService listingService;
 	public static void main(String[] args) {
 		SpringApplication.run(ScraperApplication.class, args);
 
@@ -21,7 +20,7 @@ public class ScraperApplication {
 		List<ListingDTO> result = src.fetch("");
 		for (ListingDTO listing: result) {
 			try {
-				listingRepository.save(listing);
+				listingService.saveListing(listing);
 				log("%s", listing.getTitle());
 			} catch (Exception e) {
 				e.printStackTrace();
