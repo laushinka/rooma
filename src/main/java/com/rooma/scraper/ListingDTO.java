@@ -12,7 +12,7 @@ import java.util.Date;
 @Entity
 @Builder
 @Getter
-class ListingDTO {
+public class ListingDTO {
     @Id
     @GeneratedValue
     private Long id;
