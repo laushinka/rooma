@@ -7,7 +7,8 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Craigslist implements Source {
     @Override
@@ -67,16 +68,21 @@ public class Craigslist implements Source {
                 .rentalType(RentalType.APARTMENT)
                 .title(result.getElementsByClass("result-title").text())
                 .district("")
-                .address(result.getElementsByClass("result-hood").text())
+                .address(getAddress(result))
                 .postcode("")
                 .size(getSize(result))
                 .price(getPrice(result))
                 .numberOfRooms(getNumberOfRooms(result))
-                .url(result.absUrl("href"))
+                .url(result.getElementsByClass("result-title hdrlnk").attr("href"))
                 .imageUrl(result.getElementsByAttribute("img").text())
                 .source(SourceName.CRAIGSLIST)
                 .isAvailable(true)
                 .build();
+    }
+
+    private String getAddress(Element result) {
+        String text = result.getElementsByClass("result-hood").text();
+        return text.replaceAll("[()]", "");
     }
 
     private BigDecimal getSize(Element result) {
