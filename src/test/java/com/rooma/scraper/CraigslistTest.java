@@ -11,7 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class CraigslistTest {
     private Craigslist craigslist = new Craigslist();
 
-    // Needs to be improved so that it doesn't fetch the real URL
+    // Needs to be improved so that the html can be mocked
     @Test
     public void testing() {
         List<ListingDTO> listingDTOS = craigslist.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");

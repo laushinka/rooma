@@ -116,10 +116,10 @@ public class Craigslist implements Source {
         String room = result.getElementsByClass("housing").text();
         if (!room.equals("")) {
             String trimSpaces = room.replaceAll("\\s", "");
-            if (trimSpaces.split("br-").length > 0) {
-                return trimSpaces.split("br-")[0];
+            if (trimSpaces.contains("br") && trimSpaces.split("br-").length > 0) {
+                    return trimSpaces.split("br-")[0];
+                }
             }
-        }
         return "";
     }
 }
