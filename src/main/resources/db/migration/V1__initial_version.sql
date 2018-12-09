@@ -6,7 +6,7 @@ create table listing (
     POSTCODE varchar(50),
     SIZE DECIMAL(15,2),
     PRICE DECIMAL(15,2),
-    NUMBER_OF_ROOMS varchar(50),
+    NUMBER_OF_ROOMS DECIMAL(15,2),
     URL varchar(50),
     IMAGE_URL varchar(50),
     SOURCE varchar(50),

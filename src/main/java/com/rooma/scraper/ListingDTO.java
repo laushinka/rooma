@@ -24,7 +24,7 @@ public class ListingDTO {
     private String postcode;
     private BigDecimal size;
     private BigDecimal price;
-    private String numberOfRooms;
+    private BigDecimal numberOfRooms;
     private String url;
     private String imageUrl;
     private SourceName source;

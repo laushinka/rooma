@@ -112,14 +112,14 @@ public class Craigslist implements Source {
         return BigDecimal.valueOf(0);
     }
 
-    private String getNumberOfRooms(Element result) {
+    private BigDecimal getNumberOfRooms(Element result) {
         String room = result.getElementsByClass("housing").text();
         if (!room.equals("")) {
             String trimSpaces = room.replaceAll("\\s", "");
             if (trimSpaces.contains("br") && trimSpaces.split("br-").length > 0) {
-                    return trimSpaces.split("br-")[0];
+                    return BigDecimal.valueOf(Long.parseLong(trimSpaces.split("br-")[0]));
                 }
             }
-        return "";
+        return BigDecimal.valueOf(0);
     }
 }

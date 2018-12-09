@@ -19,7 +19,7 @@ public class CraigslistTest {
         assertThat(listingDTOS.get(2).getAddress(), is("Prenzlauer berg, Berlin"));
         assertThat(listingDTOS.get(2).getPrice(), is(BigDecimal.valueOf(400)));
         assertThat(listingDTOS.get(2).getSize(), is(BigDecimal.valueOf(0)));
-        assertThat(listingDTOS.get(2).getNumberOfRooms(), is(""));
+        assertThat(listingDTOS.get(2).getNumberOfRooms(), is(BigDecimal.valueOf(0)));
         assertThat(listingDTOS.get(2).getUrl(), is("https://berlin.craigslist.de/apa/d/beautiful-studio-apartment/6757714559.html?lang=en&cc=gb"));
     }
 }
