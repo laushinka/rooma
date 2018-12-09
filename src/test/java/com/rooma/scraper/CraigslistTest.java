@@ -1,5 +1,6 @@
 package com.rooma.scraper;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -11,7 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class CraigslistTest {
     private Craigslist craigslist = new Craigslist();
 
-    // Needs to be improved so that the html can be mocked
+    // Needs to be updated
+    @Ignore
     @Test
     public void testing() {
         List<ListingDTO> listingDTOS = craigslist.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");
