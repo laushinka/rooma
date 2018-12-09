@@ -15,9 +15,8 @@ public class CraigslistTest {
     public void testing() {
         List<ListingDTO> listingDTOS = craigslist.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");
 
-        assertThat(listingDTOS.size(), is(321));
-        assertThat(listingDTOS.get(0).getTitle(), is("FRESHLY REMODELED STUDIO APARTMENT"));
-        assertThat(listingDTOS.get(0).getPrice(), is(BigDecimal.valueOf(300)));
-        assertThat(listingDTOS.get(0).getSize(), is(BigDecimal.valueOf(0)));
+        assertThat(listingDTOS.get(0).getPrice(), is(BigDecimal.valueOf(590)));
+        assertThat(listingDTOS.get(0).getSize(), is(BigDecimal.valueOf(60)));
+        assertThat(listingDTOS.get(0).getNumberOfRooms(), is("2"));
     }
 }

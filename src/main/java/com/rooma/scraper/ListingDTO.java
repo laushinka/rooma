@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.sql.Timestamp;
 
 @Entity
 @Builder
@@ -27,8 +27,8 @@ public class ListingDTO {
     private String numberOfRooms;
     private String url;
     private String imageUrl;
-    private String source;
+    private SourceName source;
     private boolean isAvailable;
-    private Date creationDate;
-    private Date modificationDate;
+    private Timestamp creationDate;
+    private Timestamp modificationDate;
 }

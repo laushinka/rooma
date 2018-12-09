@@ -7,8 +7,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Craigslist implements Source {
     @Override
@@ -65,34 +64,19 @@ public class Craigslist implements Source {
 
     private ListingDTO buildDto(Element result) {
         return ListingDTO.builder()
+                .rentalType(RentalType.APARTMENT)
                 .title(result.getElementsByClass("result-title").text())
-                .district(result.getElementsByClass("result-hood").text())
+                .district("")
+                .address(result.getElementsByClass("result-hood").text())
+                .postcode("")
                 .size(getSize(result))
                 .price(getPrice(result))
                 .numberOfRooms(getNumberOfRooms(result))
                 .url(result.absUrl("href"))
                 .imageUrl(result.getElementsByAttribute("img").text())
+                .source(SourceName.CRAIGSLIST)
+                .isAvailable(true)
                 .build();
-    }
-
-    private BigDecimal getPrice(Element result) {
-        String price = result.getElementsByClass("result-price").text();
-        if (!price.equals("")) {
-            String priceString = price.split("€")[1].trim();
-            return BigDecimal.valueOf(Long.parseLong(priceString));
-        }
-        return BigDecimal.valueOf(0);
-    }
-
-    private String getNumberOfRooms(Element result) {
-        String room = result.getElementsByClass("housing").text();
-        if (!room.equals("")) {
-            String trimSpaces = room.replaceAll("\\s", "");
-            if (trimSpaces.split("br-").length > 0) {
-                return room.split("br-")[0];
-            }
-        }
-        return "";
     }
 
     private BigDecimal getSize(Element result) {
@@ -111,5 +95,25 @@ public class Craigslist implements Source {
             return BigDecimal.valueOf(Long.parseLong(sizeString));
         }
         return BigDecimal.valueOf(0);
+    }
+
+    private BigDecimal getPrice(Element result) {
+        String price = result.getElementsByClass("result-price").text();
+        if (!price.equals("")) {
+            String priceString = price.split("€")[1].trim();
+            return BigDecimal.valueOf(Long.parseLong(priceString));
+        }
+        return BigDecimal.valueOf(0);
+    }
+
+    private String getNumberOfRooms(Element result) {
+        String room = result.getElementsByClass("housing").text();
+        if (!room.equals("")) {
+            String trimSpaces = room.replaceAll("\\s", "");
+            if (trimSpaces.split("br-").length > 0) {
+                return trimSpaces.split("br-")[0];
+            }
+        }
+        return "";
     }
 }
