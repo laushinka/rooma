@@ -45,4 +45,85 @@ public class CraigslistToListingMapperTest {
 
         assertThat(listingDTO.getAddress(), is("Friedrichshain"));
     }
+
+    @Test
+    public void mapsDistrictSeparatedWithDash() {
+        Element element = Jsoup.parse("<span class=result-hood> (Friedrichshain - Berlin)</span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getDistrict(), is("Friedrichshain"));
+    }
+
+    @Test
+    public void mapsDistrictSeparatedWithComma() {
+        Element element = Jsoup.parse("<span class=result-hood> (Friedrichshain, Berlin)</span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getDistrict(), is("Friedrichshain"));
+    }
+
+    @Test
+    public void mapsDistrictSeparatedWithWhitespace() {
+        Element element = Jsoup.parse("<span class=result-hood> (Friedrichshain Berlin)</span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getDistrict(), is("Friedrichshain"));
+    }
+
+    @Test
+    public void mapsDistrictSeparatedWithSlash() {
+        Element element = Jsoup.parse("<span class=result-hood> (Friedrichshain/Berlin)</span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getDistrict(), is("Friedrichshain"));
+    }
+
+    @Test
+    public void mapsCommonSpellingMistakeForPberg() {
+        Element element = Jsoup.parse("<span class=result-hood> (prenzlauerberg/Berlin)</span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getDistrict(), is("Prenzlauer Berg"));
+    }
+
+    @Test
+    public void mapsNonUmlautSpellingForNeukölln() {
+        Element element = Jsoup.parse("<span class=result-hood> (neukoelln/Berlin)</span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getDistrict(), is("Neukölln"));
+    }
+
+    @Test
+    public void mapsPrenzlauerBergThatHasTwoWords() {
+        Element element = Jsoup.parse("<span class=result-hood>Prenzlauer Berg</span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getDistrict(), is("Prenzlauer Berg"));
+    }
+
+    @Test
+    public void mapsPostcodeInCompleteAddress() {
+        Element element = Jsoup.parse("<span class=result-hood> (Friedrichshain, Berlin, 10243)</span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getPostcode(), is("10243"));
+    }
+
+    @Test
+    public void mapsPostcodeOnly() {
+        Element element = Jsoup.parse("<span class=result-hood>10243</span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getPostcode(), is("10243"));
+    }
 }

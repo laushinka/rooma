@@ -2,14 +2,19 @@ package com.rooma.scraper;
 
 import org.jsoup.nodes.Element;
 
+import java.util.Arrays;
+import java.util.Optional;
+
+import static com.rooma.scraper.BerlinDistricts.convertCommonMisspelling;
+
 public class CraigslistToListingMapper {
     public ListingDTO buildDto(Element result) {
         return ListingDTO.builder()
                 .rentalType(RentalType.APARTMENT)
                 .title(result.getElementsByClass("result-title").text())
-                .district("")
+                .district(getDistrict(result))
                 .address(getAddress(result))
-                .postcode("")
+                .postcode(getPostcode(result))
                 .size(getSize(result))
                 .price(getPrice(result))
                 .numberOfRooms(getNumberOfRooms(result))
@@ -18,6 +23,35 @@ public class CraigslistToListingMapper {
                 .source(SourceName.CRAIGSLIST)
                 .isAvailable(true)
                 .build();
+    }
+
+    private String getPostcode(Element result) {
+        String completeAddress = getAddress(result);
+        String[] splitAddress = completeAddress.split("\\W");
+        if (splitAddress.length > 0) {
+            for (String element : splitAddress) {
+                if (element.matches("\\d+") && element.length() == 5) {
+                    return element;
+                }
+            }
+        }
+        return "";
+    }
+
+    private String getDistrict(Element result) {
+        String completeAddress = getAddress(result);
+        String[] splitAddress = completeAddress.split("\\.|,|-|/|\\s+");
+        if (splitAddress.length > 0) {
+            for (String district : splitAddress) {
+                Optional<String> foundDistrict = Arrays.stream(BerlinDistricts.getBerlinDistricts())
+                        .filter(d -> d.toLowerCase().equals(district.trim().toLowerCase()))
+                        .findFirst();
+                if (foundDistrict.isPresent()) {
+                    return convertCommonMisspelling(foundDistrict.get());
+                }
+            }
+        }
+        return "";
     }
 
     private String getAddress(Element result) {
