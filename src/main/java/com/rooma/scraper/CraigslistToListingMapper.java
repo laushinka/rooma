@@ -2,7 +2,7 @@ package com.rooma.scraper;
 
 import org.jsoup.nodes.Element;
 
-public class ListingMapper {
+public class CraigslistToListingMapper {
     public ListingDTO buildDto(Element result) {
         return ListingDTO.builder()
                 .rentalType(RentalType.APARTMENT)

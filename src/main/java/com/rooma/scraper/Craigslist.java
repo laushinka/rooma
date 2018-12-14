@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Craigslist implements Source {
-    private ListingMapper listingMapper = new ListingMapper();
+    private CraigslistToListingMapper listingMapper = new CraigslistToListingMapper();
 
     @Override
     public List<ListingDTO> fetch(String url) {
@@ -30,6 +30,11 @@ public class Craigslist implements Source {
         processDocuments(listOfDocuments, listingDTOList);
 
         return listingDTOList;
+    }
+
+    @Override
+    public String name() {
+        return SourceName.CRAIGSLIST.name();
     }
 
     private void processDocuments(List<Document> listOfDocuments, List<ListingDTO> listingDTOList) {
