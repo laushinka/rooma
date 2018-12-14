@@ -6,8 +6,9 @@ import lombok.Getter;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.math.BigDecimal;
-import java.sql.Timestamp;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -22,13 +23,22 @@ public class ListingDTO {
     private String district;
     private String address;
     private String postcode;
-    private BigDecimal size;
-    private BigDecimal price;
-    private BigDecimal numberOfRooms;
+    private Float size;
+    private Float price;
+    private Float numberOfRooms;
     private String url;
     private String imageUrl;
     private SourceName source;
     private boolean isAvailable;
-    private Timestamp creationDate;
-    private Timestamp modificationDate;
+    private LocalDateTime creationDate;
+    private LocalDateTime modificationDate;
+
+    @PrePersist
+    @PreUpdate
+    public void setCreationDateAndModificationDateToNow() {
+        if (creationDate == null) {
+            creationDate = LocalDateTime.now();
+        }
+        modificationDate = LocalDateTime.now();
+    }
 }

@@ -2,8 +2,6 @@ package com.rooma.scraper;
 
 import org.jsoup.nodes.Element;
 
-import java.math.BigDecimal;
-
 public class ListingMapper {
     public ListingDTO buildDto(Element result) {
         return ListingDTO.builder()
@@ -27,7 +25,7 @@ public class ListingMapper {
         return text.replaceAll("[()]", "");
     }
 
-    private BigDecimal getSize(Element result) {
+    private Float getSize(Element result) {
         String size = result.getElementsByClass("housing").text();
         String sizeSplit;
 
@@ -40,28 +38,28 @@ public class ListingMapper {
                 sizeSplit = tokens[0];
             }
             String sizeString = sizeSplit.trim().split("m")[0];
-            return BigDecimal.valueOf(Long.parseLong(sizeString));
+            return Float.valueOf(sizeString);
         }
-        return BigDecimal.valueOf(0);
+        return (float) 0;
     }
 
-    private BigDecimal getPrice(Element result) {
+    private Float getPrice(Element result) {
         String price = result.getElementsByClass("result-price").text();
         if (!price.equals("")) {
             String priceString = price.split("€")[1].trim();
-            return BigDecimal.valueOf(Long.parseLong(priceString));
+            return Float.valueOf(priceString);
         }
-        return BigDecimal.valueOf(0);
+        return (float) 0;
     }
 
-    private BigDecimal getNumberOfRooms(Element result) {
+    private Float getNumberOfRooms(Element result) {
         String room = result.getElementsByClass("housing").text();
         if (!room.equals("")) {
             String trimSpaces = room.replaceAll("\\s", "");
             if (trimSpaces.contains("br") && trimSpaces.split("br-").length > 0) {
-                return BigDecimal.valueOf(Long.parseLong(trimSpaces.split("br-")[0]));
+                return Float.valueOf(trimSpaces.split("br-")[0]);
             }
         }
-        return BigDecimal.valueOf(0);
+        return (float) 0;
     }
 }
