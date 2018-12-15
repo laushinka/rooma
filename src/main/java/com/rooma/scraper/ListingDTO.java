@@ -3,11 +3,21 @@ package com.rooma.scraper;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import java.time.LocalDateTime;
 
+@Entity
 @Builder
 @Getter
-class ListingDTO {
+public class ListingDTO {
+    @Id
+    @GeneratedValue
+    private Long id;
+
     private RentalType rentalType;
     private String title;
     private String district;
@@ -15,11 +25,20 @@ class ListingDTO {
     private String postcode;
     private Float size;
     private Float price;
-    private String numberOfRooms;
+    private Float numberOfRooms;
     private String url;
     private String imageUrl;
-    private String source;
+    private SourceName source;
     private boolean isAvailable;
-    private Date creationDate;
-    private Date modificationDate;
+    private LocalDateTime creationDate;
+    private LocalDateTime modificationDate;
+
+    @PrePersist
+    @PreUpdate
+    public void setCreationDateAndModificationDateToNow() {
+        if (creationDate == null) {
+            creationDate = LocalDateTime.now();
+        }
+        modificationDate = LocalDateTime.now();
+    }
 }
