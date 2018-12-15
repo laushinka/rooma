@@ -29,6 +29,33 @@ public class CraigslistToListingMapperTest {
     }
 
     @Test
+    public void mapsSize() {
+        Element element = Jsoup.parse("<span class=housing> 2br - 52m<sup>2</sup> - </span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getSize(), is(52F));
+    }
+
+    @Test
+    public void mapsSizeOnly() {
+        Element element = Jsoup.parse("<span class=housing> - 52m<sup>2</sup> - </span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getSize(), is(52F));
+    }
+
+    @Test
+    public void mapsNonExistingSize() {
+        Element element = Jsoup.parse("<span class=housing>2br - </span>");
+
+        ListingDTO listingDTO = listingMapper.buildDto(element);
+
+        assertThat(listingDTO.getSize(), is(0F));
+    }
+
+    @Test
     public void mapsPrice() {
         Element element = Jsoup.parse("<span class=result-price>€1100</span>");
 
@@ -52,7 +79,7 @@ public class CraigslistToListingMapperTest {
 
         ListingDTO listingDTO = listingMapper.buildDto(element);
 
-        assertThat(listingDTO.getDistrict(), is("Friedrichshain"));
+        assertThat(listingDTO.getDistrict(), is("friedrichshain"));
     }
 
     @Test
@@ -61,7 +88,7 @@ public class CraigslistToListingMapperTest {
 
         ListingDTO listingDTO = listingMapper.buildDto(element);
 
-        assertThat(listingDTO.getDistrict(), is("Friedrichshain"));
+        assertThat(listingDTO.getDistrict(), is("friedrichshain"));
     }
 
     @Test
@@ -70,7 +97,7 @@ public class CraigslistToListingMapperTest {
 
         ListingDTO listingDTO = listingMapper.buildDto(element);
 
-        assertThat(listingDTO.getDistrict(), is("Friedrichshain"));
+        assertThat(listingDTO.getDistrict(), is("friedrichshain"));
     }
 
     @Test
@@ -79,7 +106,7 @@ public class CraigslistToListingMapperTest {
 
         ListingDTO listingDTO = listingMapper.buildDto(element);
 
-        assertThat(listingDTO.getDistrict(), is("Friedrichshain"));
+        assertThat(listingDTO.getDistrict(), is("friedrichshain"));
     }
 
     @Test
@@ -88,7 +115,7 @@ public class CraigslistToListingMapperTest {
 
         ListingDTO listingDTO = listingMapper.buildDto(element);
 
-        assertThat(listingDTO.getDistrict(), is("Prenzlauer Berg"));
+        assertThat(listingDTO.getDistrict(), is("prenzlauer berg"));
     }
 
     @Test
@@ -97,7 +124,7 @@ public class CraigslistToListingMapperTest {
 
         ListingDTO listingDTO = listingMapper.buildDto(element);
 
-        assertThat(listingDTO.getDistrict(), is("Neukölln"));
+        assertThat(listingDTO.getDistrict(), is("neukölln"));
     }
 
     @Test
@@ -106,7 +133,7 @@ public class CraigslistToListingMapperTest {
 
         ListingDTO listingDTO = listingMapper.buildDto(element);
 
-        assertThat(listingDTO.getDistrict(), is("Prenzlauer Berg"));
+        assertThat(listingDTO.getDistrict(), is("prenzlauer berg"));
     }
 
     @Test

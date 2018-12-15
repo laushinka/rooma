@@ -44,7 +44,7 @@ public class CraigslistToListingMapper {
         if (splitAddress.length > 0) {
             for (String district : splitAddress) {
                 Optional<String> foundDistrict = Arrays.stream(BerlinDistricts.getBerlinDistricts())
-                        .filter(d -> d.toLowerCase().equals(district.trim().toLowerCase()))
+                        .filter(d -> d.equals(district.trim().toLowerCase()))
                         .findFirst();
                 if (foundDistrict.isPresent()) {
                     return convertCommonMisspelling(foundDistrict.get());
@@ -61,18 +61,16 @@ public class CraigslistToListingMapper {
 
     private Float getSize(Element result) {
         String size = result.getElementsByClass("housing").text();
-        String sizeSplit;
 
-        if (!size.equals("")) {
-            String trimSpaces = size.replaceAll("\\s", "");
-            String[] tokens = trimSpaces.split("br-");
-            if (tokens.length > 1) {
-                sizeSplit = tokens[1];
-            } else {
-                sizeSplit = tokens[0];
+        if (!size.equals("") && size.contains("m")) {
+            String withoutSpaces = size.replaceAll("\\s", "");
+            String[] elements = withoutSpaces.split("-");
+
+            for (String element : elements) {
+                if (element.contains("m")) {
+                    return Float.valueOf(element.split(("m"))[0]);
+                }
             }
-            String sizeString = sizeSplit.trim().split("m")[0];
-            return Float.valueOf(sizeString);
         }
         return (float) 0;
     }
