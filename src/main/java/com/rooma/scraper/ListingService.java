@@ -11,14 +11,15 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 class ListingService {
-    private ListingRepository listingRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(ListingService.class);
+    private ListingRepository listingRepository;
 
     @Scheduled(initialDelay = 2000, fixedDelay = 1000)
     void fetchListingsJob() {
         Source craigslistJob = SourceFactory.create("craigslist");
         LOGGER.info("Starting craigslist scheduled job");
         List<ListingDTO> craigslistListings = craigslistJob.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");
+
         for (ListingDTO listing : craigslistListings) {
             try {
                 listingRepository.save(listing);
@@ -27,5 +28,6 @@ class ListingService {
                 LOGGER.error("Unable to save {} due to {}", listing.getTitle(), e.getMessage());
             }
         }
+
     }
 }
