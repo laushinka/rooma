@@ -1,18 +1,15 @@
 package com.rooma.scraper;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.List;
 
 @SpringBootApplication
+@EnableScheduling
 public class ScraperApplication implements CommandLineRunner{
-
-    @Autowired
-    private ListingService listingService;
-
     public static void main(String[] args) {
 		SpringApplication.run(ScraperApplication.class, args);
 	}
@@ -28,7 +25,6 @@ public class ScraperApplication implements CommandLineRunner{
             List<ListingDTO> result = src.fetch("");
             for (ListingDTO listing: result) {
                 try {
-                    listingService.saveListing(listing);
                     log("%s", listing.getTitle());
                 } catch (Exception e) {
                     e.printStackTrace();
