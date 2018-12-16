@@ -1,5 +1,7 @@
 package com.rooma.scraper;
 
+import com.rooma.scraper.domain.model.Listing;
+import com.rooma.scraper.source.craigslist.Craigslist;
 import org.junit.Test;
 
 import java.util.List;
@@ -12,8 +14,8 @@ public class CraigslistTest {
 
     @Test
     public void fetchesAllListings() {
-        List<ListingDTO> listingDTOS = craigslist.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");
+        List<Listing> listings = craigslist.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");
 
-        assertThat(listingDTOS.size(), is(300));
+        assertThat(listings.size(), is(300));
     }
 }

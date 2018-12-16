@@ -1,5 +1,7 @@
-package com.rooma.scraper;
+package com.rooma.scraper.source.craigslist;
 
+import com.rooma.scraper.domain.model.Listing;
+import com.rooma.scraper.source.Source;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,13 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Craigslist implements Source {
-    private CraigslistToListingMapper listingMapper = new CraigslistToListingMapper();
+    public static final String NAME = "craigslist";
+
+    private ListingMapper listingMapper = new ListingMapper();
 
     @Override
-    public List<ListingDTO> fetch(String url) {
+    public List<Listing> fetch(String url) {
         List<String> listOfPages = new ArrayList<>();
         List<Document> listOfDocuments = new ArrayList<>();
-        List<ListingDTO> listingDTOList = new ArrayList<>();
+        List<Listing> listingList = new ArrayList<>();
 
         try {
             List<String> urls = getUrls(listOfPages);
@@ -27,22 +31,22 @@ public class Craigslist implements Source {
             e.printStackTrace();
         }
 
-        processDocuments(listOfDocuments, listingDTOList);
+        processDocuments(listOfDocuments, listingList);
 
-        return listingDTOList;
+        return listingList;
     }
 
     @Override
     public String name() {
-        return SourceName.CRAIGSLIST.name();
+        return Craigslist.NAME;
     }
 
-    private void processDocuments(List<Document> listOfDocuments, List<ListingDTO> listingDTOList) {
+    private void processDocuments(List<Document> listOfDocuments, List<Listing> listingList) {
         for (Document doc : listOfDocuments) {
             Elements listOfResults = doc.select("li.result-row");
             for (Element result : listOfResults) {
-                ListingDTO listingDTO = listingMapper.buildDto(result);
-                listingDTOList.add(listingDTO);
+                Listing listing = listingMapper.buildDto(result);
+                listingList.add(listing);
             }
         }
     }

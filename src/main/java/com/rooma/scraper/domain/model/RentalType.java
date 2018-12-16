@@ -1,4 +1,4 @@
-package com.rooma.scraper;
+package com.rooma.scraper.domain.model;
 
 public enum RentalType {
     WG,

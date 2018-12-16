@@ -1,4 +1,4 @@
-package com.rooma.scraper;
+package com.rooma.scraper.domain.model;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @Getter
-public class ListingDTO {
+public class Listing {
     @Id
     @GeneratedValue
     private Long id;
@@ -28,7 +28,7 @@ public class ListingDTO {
     private Float numberOfRooms;
     private String url;
     private String imageUrl;
-    private SourceName source;
+    private String source;
     private boolean isAvailable;
     private LocalDateTime creationDate;
     private LocalDateTime modificationDate;
