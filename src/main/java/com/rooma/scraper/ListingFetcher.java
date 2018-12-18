@@ -10,14 +10,14 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-class ListingService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ListingService.class);
+class ListingFetcher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ListingFetcher.class);
     private ListingRepository listingRepository;
 
     @Scheduled(initialDelay = 2000, fixedDelay = 10000)
     void fetchListingsJob() {
-        List<ListingDTO> craigslistListings = startFetching();
         deleteAllRows();
+        List<ListingDTO> craigslistListings = startFetching();
 
         for (ListingDTO listing : craigslistListings) {
             saveNewListings(listing);
