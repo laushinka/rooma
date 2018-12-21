@@ -1,5 +1,6 @@
-package com.rooma.scraper;
+package com.rooma.scraper.source.craigslist;
 
+import com.rooma.scraper.listing.Listing;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.junit.Test;
@@ -7,8 +8,8 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class CraigslistToListingMapperTest {
-    private CraigslistToListingMapper listingMapper = new CraigslistToListingMapper();
+public class ListingMapperTest {
+    private ListingMapper listingMapper = new ListingMapper();
 
     @Test
     public void mapsTitle() {

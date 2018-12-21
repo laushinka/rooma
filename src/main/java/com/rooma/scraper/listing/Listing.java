@@ -1,5 +1,6 @@
-package com.rooma.scraper;
+package com.rooma.scraper.listing;
 
+import com.rooma.scraper.RentalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,7 +44,7 @@ public class Listing {
     private Float numberOfRooms;
     private String url;
     private String imageUrl;
-    private SourceName source;
+    private String source;
     private boolean isAvailable;
     private LocalDateTime creationDate;
     private LocalDateTime modificationDate;

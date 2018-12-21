@@ -1,5 +1,7 @@
-package com.rooma.scraper;
+package com.rooma.scraper.listing;
 
+import com.rooma.scraper.source.SourceService;
+import com.rooma.scraper.source.SourceFactory;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +36,13 @@ class ListingFetcher {
     }
 
     private List<Listing> startFetching() {
-        Source craigslistJob = SourceFactory.create("craigslist");
+        SourceService craigslistJob = SourceFactory.create("craigslist");
         LOGGER.info("Starting craigslist scheduled job");
         return craigslistJob.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");
     }
 
     private void deleteAllRows() {
-        listingRepository.deleteAllBy(SourceName.CRAIGSLIST);
-        LOGGER.info("Deleted all rows in Craigslist table");
+        listingRepository.deleteAll();
+        LOGGER.info("Deleted all rows in craigslist table");
     }
 }

@@ -1,6 +1,5 @@
-package com.rooma.scraper;
+package com.rooma.scraper.criteria;
 
-import com.rooma.scraper.Criteria.CriteriaFilter;
 import org.springframework.data.repository.Repository;
 
 public interface CriteriaRepository extends Repository<CriteriaFilter, Long>{

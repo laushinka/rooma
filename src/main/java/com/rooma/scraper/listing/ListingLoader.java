@@ -1,6 +1,7 @@
-package com.rooma.scraper;
+package com.rooma.scraper.listing;
 
-import com.rooma.scraper.Criteria.CriteriaFilter;
+import com.rooma.scraper.criteria.CriteriaFilter;
+import com.rooma.scraper.criteria.CriteriaRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

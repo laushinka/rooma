@@ -1,4 +1,4 @@
-package com.rooma.scraper.Criteria;
+package com.rooma.scraper.criteria;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

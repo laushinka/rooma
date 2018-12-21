@@ -1,5 +1,6 @@
-package com.rooma.scraper;
+package com.rooma.scraper.source.craigslist;
 
+import com.rooma.scraper.listing.Listing;
 import org.junit.Test;
 
 import java.util.List;
