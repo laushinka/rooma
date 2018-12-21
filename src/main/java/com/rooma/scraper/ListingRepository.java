@@ -16,11 +16,10 @@ public interface ListingRepository extends Repository<Listing, Long> {
     @Query(value = "DELETE from Listing")
     void deleteAllBy(SourceName sourceName);
 
-    @Query(value = "SELECT title FROM Listing l WHERE l.price <= :maxPrice AND l.district like :district AND l.numberOfRooms >= :minNumberOfRooms AND l.size >= :minSize AND l.source = :source")
+    @Query(value = "SELECT title FROM Listing l WHERE l.price <= :maxPrice AND l.district like :district AND l.numberOfRooms >= :minNumberOfRooms AND l.size >= :minSize")
     List<Listing> findBy(@Param("maxPrice") Float maxPrice,
                          @Param("district") String district,
                          @Param("minNumberOfRooms") Float numberOfRooms,
-                         @Param("minSize") Float minSize,
-                         @Param("source") String source
+                         @Param("minSize") Float minSize
     );
 }

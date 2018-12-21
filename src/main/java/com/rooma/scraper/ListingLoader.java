@@ -18,7 +18,7 @@ public class ListingLoader {
     void loadListingsJob() {
         List<Listing> results = null;
         try {
-            results = listingRepository.findBy(800f, "mitte", 2f, 40f, "craigslist");
+            results = listingRepository.findBy(800f, "mitte", 2f, 40f);
             LOGGER.info("Found listings {}", results.size());
         } catch (Exception e) {
             LOGGER.info("Could not load listings {}", e.getMessage());
