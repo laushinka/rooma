@@ -1,5 +1,6 @@
 package com.rooma.scraper;
 
+import com.rooma.scraper.Criteria.CriteriaFilter;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +14,14 @@ import java.util.List;
 public class ListingLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ListingLoader.class);
     private ListingRepository listingRepository;
+    private CriteriaRepository criteriaRepository;
 
     @Scheduled(initialDelay = 3000, fixedDelay = 10000000)
     void loadListingsJob() {
         List<Listing> results = null;
+        CriteriaFilter filter = processFilters();
         try {
-            results = listingRepository.findBy(800f, "mitte", 2f, 40f);
+            results = getFilterResults(filter);
             LOGGER.info("Found listings {}", results.size());
         } catch (Exception e) {
             LOGGER.info("Could not load listings {}", e.getMessage());
@@ -27,5 +30,29 @@ public class ListingLoader {
         if (results == null) {
             LOGGER.info("No listings found");
         }
+    }
+
+    private List<Listing> getFilterResults(CriteriaFilter filter) {
+        return listingRepository.findBy(
+                filter.getMaxPrice(),
+                filter.getDistrict(),
+                filter.getMinNumberOfRooms(),
+                filter.getMinSize());
+    }
+
+    private CriteriaFilter processFilters() {
+        CriteriaFilter filter = getFilter();
+        criteriaRepository.save(filter);
+        LOGGER.info("Saved filter {}");
+        return filter;
+    }
+
+    private CriteriaFilter getFilter() {
+        return CriteriaFilter.builder()
+                .district("mitte")
+                .minNumberOfRooms(2f)
+                .maxPrice(800f)
+                .minSize(40f)
+                .build();
     }
 }
