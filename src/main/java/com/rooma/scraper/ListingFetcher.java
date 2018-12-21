@@ -17,23 +17,23 @@ class ListingFetcher {
     @Scheduled(initialDelay = 2000, fixedDelay = 10000)
     void fetchListingsJob() {
         deleteAllRows();
-        List<ListingDTO> craigslistListings = startFetching();
+        List<Listing> craigslistListings = startFetching();
 
-        for (ListingDTO listing : craigslistListings) {
+        for (Listing listing : craigslistListings) {
             saveNewListings(listing);
         }
+        LOGGER.info("Saved {} listings", craigslistListings.size());
     }
 
-    private void saveNewListings(ListingDTO listing) {
+    private void saveNewListings(Listing listing) {
         try {
             listingRepository.save(listing);
-            LOGGER.info("Saved listing {}", listing.getTitle());
         } catch (Exception e) {
             LOGGER.error("Unable to process {} due to {}", listing.getTitle(), e.getMessage());
         }
     }
 
-    private List<ListingDTO> startFetching() {
+    private List<Listing> startFetching() {
         Source craigslistJob = SourceFactory.create("craigslist");
         LOGGER.info("Starting craigslist scheduled job");
         return craigslistJob.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");

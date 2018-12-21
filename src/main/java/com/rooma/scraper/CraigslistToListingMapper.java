@@ -8,8 +8,8 @@ import java.util.Optional;
 import static com.rooma.scraper.BerlinDistricts.convertCommonMisspelling;
 
 public class CraigslistToListingMapper {
-    public ListingDTO buildDto(Element result) {
-        return ListingDTO.builder()
+    public Listing buildDto(Element result) {
+        return Listing.builder()
                 .rentalType(RentalType.APARTMENT)
                 .title(result.getElementsByClass("result-title").text())
                 .district(getDistrict(result))

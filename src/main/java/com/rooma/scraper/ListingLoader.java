@@ -16,7 +16,7 @@ public class ListingLoader {
 
     @Scheduled(initialDelay = 3000, fixedDelay = 10000000)
     void loadListingsJob() {
-        List<ListingDTO> results = null;
+        List<Listing> results = null;
         try {
             results = listingRepository.findByPrice();
             LOGGER.info("Found listings {}", results.size());

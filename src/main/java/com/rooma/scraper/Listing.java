@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @Getter
-public class ListingDTO {
+public class Listing {
     @Id
     @GeneratedValue
     private Long id;

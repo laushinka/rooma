@@ -13,10 +13,10 @@ public class Craigslist implements Source {
     private CraigslistToListingMapper listingMapper = new CraigslistToListingMapper();
 
     @Override
-    public List<ListingDTO> fetch(String url) {
+    public List<Listing> fetch(String url) {
         List<String> listOfPages = new ArrayList<>();
         List<Document> listOfDocuments = new ArrayList<>();
-        List<ListingDTO> listingDTOList = new ArrayList<>();
+        List<Listing> listingList = new ArrayList<>();
 
         try {
             List<String> urls = getUrls(listOfPages);
@@ -27,9 +27,9 @@ public class Craigslist implements Source {
             e.printStackTrace();
         }
 
-        processDocuments(listOfDocuments, listingDTOList);
+        processDocuments(listOfDocuments, listingList);
 
-        return listingDTOList;
+        return listingList;
     }
 
     @Override
@@ -37,12 +37,12 @@ public class Craigslist implements Source {
         return SourceName.CRAIGSLIST.name();
     }
 
-    private void processDocuments(List<Document> listOfDocuments, List<ListingDTO> listingDTOList) {
+    private void processDocuments(List<Document> listOfDocuments, List<Listing> listingList) {
         for (Document doc : listOfDocuments) {
             Elements listOfResults = doc.select("li.result-row");
             for (Element result : listOfResults) {
-                ListingDTO listingDTO = listingMapper.buildDto(result);
-                listingDTOList.add(listingDTO);
+                Listing listing = listingMapper.buildDto(result);
+                listingList.add(listing);
             }
         }
     }

@@ -7,14 +7,14 @@ import org.springframework.data.repository.Repository;
 import javax.transaction.Transactional;
 import java.util.List;
 
-public interface ListingRepository extends Repository<ListingDTO, Long> {
-    ListingDTO save(ListingDTO listing);
+public interface ListingRepository extends Repository<Listing, Long> {
+    Listing save(Listing listing);
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE from ListingDTO")
+    @Query(value = "DELETE from Listing")
     void deleteAllBy(SourceName sourceName);
 
-    @Query(value = "SELECT title FROM ListingDTO WHERE price <= 800")
-    List<ListingDTO> findByPrice();
+    @Query(value = "SELECT title FROM Listing WHERE price <= 800")
+    List<Listing> findByPrice();
 }
