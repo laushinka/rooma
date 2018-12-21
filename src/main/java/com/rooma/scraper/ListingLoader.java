@@ -18,7 +18,7 @@ public class ListingLoader {
     void loadListingsJob() {
         List<Listing> results = null;
         try {
-            results = listingRepository.findByPrice();
+            results = listingRepository.findByPrice(800f, "mitte", 2f);
             LOGGER.info("Found listings {}", results.size());
         } catch (Exception e) {
             LOGGER.info("Could not load listings {}", e.getMessage());
