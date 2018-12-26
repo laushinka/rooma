@@ -14,6 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 @RequiredArgsConstructor
 class SearchController {
     private final ListingRepository listingRepository;
+    private final SearchFilterRepository searchFilterRepository;
 
     @GetMapping(
             path = "/search/{maxPrice}/{district}/{minNumberOfRooms}/{minSize}",
@@ -26,5 +27,25 @@ class SearchController {
     ) {
         List<Listing> result = listingRepository.findBy(maxPrice, district, minNumberOfRooms, minSize);
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping(
+            path = "/savesearch/{maxPrice}/{district}/{minNumberOfRooms}/{minSize}",
+            produces = APPLICATION_JSON_UTF8_VALUE
+    )
+    ResponseEntity<SearchFilter> saveSearch(@PathVariable Float maxPrice,
+                                            @PathVariable String district,
+                                            @PathVariable Float minNumberOfRooms,
+                                            @PathVariable Float minSize) {
+
+        SearchFilter filter = SearchFilter.builder()
+                .maxPrice(maxPrice)
+                .district(district)
+                .minNumberOfRooms(minNumberOfRooms)
+                .minSize(minSize)
+                .build();
+
+        searchFilterRepository.save(filter);
+        return ResponseEntity.ok(filter);
     }
 }
