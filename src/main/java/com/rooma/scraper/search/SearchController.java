@@ -1,5 +1,7 @@
-package com.rooma.scraper.listing;
+package com.rooma.scraper.search;
 
+import com.rooma.scraper.listing.Listing;
+import com.rooma.scraper.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +12,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
 @RequiredArgsConstructor
-class ListingSearchController {
+class SearchController {
     private final ListingRepository listingRepository;
 
     @GetMapping(

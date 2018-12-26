@@ -1,4 +1,4 @@
-package com.rooma.scraper.criteria;
+package com.rooma.scraper.search;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,14 +16,14 @@ import javax.persistence.Id;
 @Entity
 @Builder
 @Getter
-public class CriteriaFilter {
+public class SearchFilter {
     @Id
     @GeneratedValue(generator="sequence-generator")
     @GenericGenerator(
             name = "sequence-generator",
             strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
             parameters = {
-                    @Parameter(name = "sequence_name", value = "criteria_filter_sequence"),
+                    @Parameter(name = "sequence_name", value = "search_filter_sequence"),
                     @Parameter(name = "initial_value", value = "1"),
                     @Parameter(name = "increment_size", value = "1")
             }

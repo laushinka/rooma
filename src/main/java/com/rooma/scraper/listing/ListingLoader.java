@@ -1,7 +1,7 @@
 package com.rooma.scraper.listing;
 
-import com.rooma.scraper.criteria.CriteriaFilter;
-import com.rooma.scraper.criteria.CriteriaRepository;
+import com.rooma.scraper.search.SearchFilter;
+import com.rooma.scraper.search.SearchFilterRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +15,12 @@ import java.util.List;
 public class ListingLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ListingLoader.class);
     private ListingRepository listingRepository;
-    private CriteriaRepository criteriaRepository;
+    private SearchFilterRepository searchFilterRepository;
 
     @Scheduled(initialDelay = 3000, fixedDelay = 10000000)
     void loadListingsJob() {
         List<Listing> results = null;
-        CriteriaFilter filter = processFilters();
+        SearchFilter filter = processFilters();
         try {
             results = getFilterResults(filter);
             LOGGER.info("Found listings {}", results.size());
@@ -33,7 +33,7 @@ public class ListingLoader {
         }
     }
 
-    private List<Listing> getFilterResults(CriteriaFilter filter) {
+    private List<Listing> getFilterResults(SearchFilter filter) {
         return listingRepository.findBy(
                 filter.getMaxPrice(),
                 filter.getDistrict(),
@@ -41,15 +41,15 @@ public class ListingLoader {
                 filter.getMinSize());
     }
 
-    private CriteriaFilter processFilters() {
-        CriteriaFilter filter = getFilter();
-        criteriaRepository.save(filter);
+    private SearchFilter processFilters() {
+        SearchFilter filter = getFilter();
+        searchFilterRepository.save(filter);
         LOGGER.info("Saved filter {}");
         return filter;
     }
 
-    private CriteriaFilter getFilter() {
-        return CriteriaFilter.builder()
+    private SearchFilter getFilter() {
+        return SearchFilter.builder()
                 .district("mitte")
                 .minNumberOfRooms(2f)
                 .maxPrice(800f)
