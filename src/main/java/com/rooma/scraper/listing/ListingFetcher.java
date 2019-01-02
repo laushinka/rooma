@@ -16,7 +16,7 @@ class ListingFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ListingFetcher.class);
     private ListingRepository listingRepository;
 
-    @Scheduled(initialDelay = 2000, fixedDelay = 10000)
+    @Scheduled(initialDelay = 2000, fixedDelay = 1000000000)
     void fetchListingsJob() {
         deleteAllRows();
         List<Listing> craigslistListings = startFetching();

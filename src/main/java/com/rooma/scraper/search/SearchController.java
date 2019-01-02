@@ -17,26 +17,25 @@ class SearchController {
     private final SearchFilterRepository searchFilterRepository;
 
     @GetMapping(
-            path = "/search/{maxPrice}/{district}/{minNumberOfRooms}/{minSize}",
+            path = "/district/{district}?maxPrice={maxPrice}&minNumberOfRooms={minNumberOfRooms}&minSize={minSize}",
             produces = APPLICATION_JSON_UTF8_VALUE
     )
-    ResponseEntity<List<Listing>> search(@PathVariable Float maxPrice,
-                                         @PathVariable String district,
-                                         @PathVariable Float minNumberOfRooms,
-                                         @PathVariable Float minSize
-    ) {
+    ResponseEntity<List<Listing>> search(@PathVariable String district,
+                                         @RequestParam Float maxPrice,
+                                         @RequestParam Float minNumberOfRooms,
+                                         @RequestParam Float minSize) {
         List<Listing> result = listingRepository.findBy(maxPrice, district, minNumberOfRooms, minSize);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping(
-            path = "/savesearch/{maxPrice}/{district}/{minNumberOfRooms}/{minSize}",
+            path = "/district/{district}?maxPrice={maxPrice}&minNumberOfRooms={minNumberOfRooms}&minSize={minSize}",
             produces = APPLICATION_JSON_UTF8_VALUE
     )
-    ResponseEntity<SearchFilter> saveSearch(@PathVariable Float maxPrice,
-                                            @PathVariable String district,
-                                            @PathVariable Float minNumberOfRooms,
-                                            @PathVariable Float minSize) {
+    ResponseEntity<SearchFilter> saveSearch(@PathVariable String district,
+                                            @RequestParam Float maxPrice,
+                                            @RequestParam Float minNumberOfRooms,
+                                            @RequestParam Float minSize) {
 
         SearchFilter filter = SearchFilter.builder()
                 .maxPrice(maxPrice)

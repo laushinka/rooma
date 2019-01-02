@@ -12,12 +12,12 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class ListingLoader {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ListingLoader.class);
+public class ListingFinder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ListingFinder.class);
     private ListingRepository listingRepository;
     private SearchFilterRepository searchFilterRepository;
 
-    @Scheduled(initialDelay = 3000, fixedDelay = 10000000)
+    @Scheduled(initialDelay = 3000, fixedDelay = 1000000000)
     void loadListingsJob() {
         List<Listing> results = null;
         SearchFilter filter = processFilters();
