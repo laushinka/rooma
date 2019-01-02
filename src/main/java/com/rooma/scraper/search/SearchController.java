@@ -16,20 +16,22 @@ class SearchController {
     private final ListingRepository listingRepository;
     private final SearchFilterRepository searchFilterRepository;
 
-    @GetMapping(
-            path = "/district/{district}?maxPrice={maxPrice}&minNumberOfRooms={minNumberOfRooms}&minSize={minSize}",
+    @RequestMapping(
+            value = "/district/{district}",
+            method = RequestMethod.GET,
             produces = APPLICATION_JSON_UTF8_VALUE
     )
     ResponseEntity<List<Listing>> search(@PathVariable String district,
-                                         @RequestParam Float maxPrice,
-                                         @RequestParam Float minNumberOfRooms,
-                                         @RequestParam Float minSize) {
+                                         @RequestParam(required = false, defaultValue = "100000") Float maxPrice,
+                                         @RequestParam(required = false, defaultValue = "1") Float minNumberOfRooms,
+                                         @RequestParam(required = false, defaultValue = "1") Float minSize) {
         List<Listing> result = listingRepository.findBy(maxPrice, district, minNumberOfRooms, minSize);
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping(
-            path = "/district/{district}?maxPrice={maxPrice}&minNumberOfRooms={minNumberOfRooms}&minSize={minSize}",
+    @RequestMapping(
+            value = "/district/{district}",
+            method = RequestMethod.POST,
             produces = APPLICATION_JSON_UTF8_VALUE
     )
     ResponseEntity<SearchFilter> saveSearch(@PathVariable String district,
