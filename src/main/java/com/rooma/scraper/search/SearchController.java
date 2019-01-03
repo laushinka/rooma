@@ -36,7 +36,7 @@ class SearchController {
             consumes = APPLICATION_FORM_URLENCODED_VALUE
     )
     @ResponseBody
-    ResponseEntity<List<SearchResult>> slackSearch(@RequestBody String body) {
+    ResponseEntity<?> slackSearch(@RequestBody String body) {
         String payload = StringUtils.substringAfter(body, "text=");
         String district = payload.split("&")[0].split("\\+")[0];
         Float price = Float.valueOf(payload.split("&")[0].split("\\+")[1]);
@@ -53,7 +53,11 @@ class SearchController {
             searchResults.add(searchResult);
         }
 
-        return ResponseEntity.ok(searchResults);
+        if (searchResults.size() > 0) {
+            return ResponseEntity.ok(searchResults);
+        } else {
+            return ResponseEntity.ok("No listings are found for your search criteria :cry:");
+        }
     }
 
     @RequestMapping(
