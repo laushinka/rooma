@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
@@ -26,6 +27,7 @@ class SearchController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchController.class);
     private final ListingRepository listingRepository;
     private final SearchFilterRepository searchFilterRepository;
+    private ListingToSearchResultMapper mapper = new ListingToSearchResultMapper();
 
     @RequestMapping(
             value = "/district",
@@ -34,7 +36,7 @@ class SearchController {
             consumes = APPLICATION_FORM_URLENCODED_VALUE
     )
     @ResponseBody
-    ResponseEntity<List<Listing>> slackSearch(@RequestBody String body) {
+    ResponseEntity<List<SearchResult>> slackSearch(@RequestBody String body) {
         String payload = StringUtils.substringAfter(body, "text=");
         String district = payload.split("&")[0].split("\\+")[0];
         Float price = Float.valueOf(payload.split("&")[0].split("\\+")[1]);
@@ -44,7 +46,14 @@ class SearchController {
         LOGGER.info("Searched district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}", district, price, numberOfRooms, minSize);
 
         List<Listing> result = listingRepository.findBy(price, district, numberOfRooms, minSize);
-        return ResponseEntity.ok(result);
+
+        List<SearchResult> searchResults = new ArrayList<>();
+        for(Listing listing : result) {
+            SearchResult searchResult = mapper.map(listing);
+            searchResults.add(searchResult);
+        }
+
+        return ResponseEntity.ok(searchResults);
     }
 
     @RequestMapping(

@@ -1,13 +1,19 @@
 package com.rooma.scraper.search;
 
-import com.rooma.scraper.listing.Listing;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Builder
 @Getter
 public class SearchResult {
-    private List<Listing> result;
+    private String title;
+    private String district;
+    private String address;
+    private String postcode;
+    private Float size;
+    private Float price;
+    private Float numberOfRooms;
+    private String url;
+    private String imageUrl;
+    private String source;
 }
