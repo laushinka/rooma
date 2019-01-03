@@ -3,18 +3,44 @@ package com.rooma.scraper.search;
 import com.rooma.scraper.listing.Listing;
 import com.rooma.scraper.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
 @RequiredArgsConstructor
 class SearchController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchController.class);
     private final ListingRepository listingRepository;
-    private final SearchFilterRepository searchFilterRepository;
+
+    @RequestMapping(
+            value = "/district",
+            method = RequestMethod.POST,
+            produces = APPLICATION_JSON_UTF8_VALUE,
+            consumes = APPLICATION_FORM_URLENCODED_VALUE
+    )
+    @ResponseBody
+    ResponseEntity<List<Listing>> slackSearch(@RequestBody String body) {
+        String text = StringUtils.substringAfter(body, "text=");
+        String district = text.split("&")[0];
+        LOGGER.info("Response {}", district);
+
+        List<Listing> result = listingRepository.findBy(3000f, district, 1f, 30f);
+        return ResponseEntity.ok(result);
+    }
 
     @RequestMapping(
             value = "/district/{district}",
@@ -27,26 +53,5 @@ class SearchController {
                                          @RequestParam(required = false, defaultValue = "1") Float minSize) {
         List<Listing> result = listingRepository.findBy(maxPrice, district, minNumberOfRooms, minSize);
         return ResponseEntity.ok(result);
-    }
-
-    @RequestMapping(
-            value = "/district/{district}",
-            method = RequestMethod.POST,
-            produces = APPLICATION_JSON_UTF8_VALUE
-    )
-    ResponseEntity<SearchFilter> saveSearch(@PathVariable String district,
-                                            @RequestParam Float maxPrice,
-                                            @RequestParam Float minNumberOfRooms,
-                                            @RequestParam Float minSize) {
-
-        SearchFilter filter = SearchFilter.builder()
-                .maxPrice(maxPrice)
-                .district(district)
-                .minNumberOfRooms(minNumberOfRooms)
-                .minSize(minSize)
-                .build();
-
-        searchFilterRepository.save(filter);
-        return ResponseEntity.ok(filter);
     }
 }
