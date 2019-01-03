@@ -35,12 +35,14 @@ class SearchController {
     @ResponseBody
     ResponseEntity<List<Listing>> slackSearch(@RequestBody String body) {
         String payload = StringUtils.substringAfter(body, "text=");
-        String district = StringUtils.substringBefore(payload.split("&")[0], "+");
-        String price = StringUtils.substringAfter(payload.split("&")[0], "+");
+        String district = payload.split("&")[0].split("\\+")[0];
+        Float price = Float.valueOf(payload.split("&")[0].split("\\+")[1]);
+        Float numberOfRooms = Float.valueOf(payload.split("&")[0].split("\\+")[2]);
+        Float minSize = Float.valueOf(payload.split("&")[0].split("\\+")[3]);
 
-        LOGGER.info("District = {}, maxPrice = {}", district, price);
+        LOGGER.info("district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}", district, price, numberOfRooms, minSize);
 
-        List<Listing> result = listingRepository.findBy(Float.valueOf(price), district, 1f, 30f);
+        List<Listing> result = listingRepository.findBy(price, district, numberOfRooms, minSize);
         return ResponseEntity.ok(result);
     }
 
