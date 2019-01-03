@@ -25,6 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 class SearchController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchController.class);
     private final ListingRepository listingRepository;
+    private final SearchFilterRepository searchFilterRepository;
 
     @RequestMapping(
             value = "/district",
@@ -40,10 +41,37 @@ class SearchController {
         Float numberOfRooms = Float.valueOf(payload.split("&")[0].split("\\+")[2]);
         Float minSize = Float.valueOf(payload.split("&")[0].split("\\+")[3]);
 
-        LOGGER.info("district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}", district, price, numberOfRooms, minSize);
+        LOGGER.info("Searched district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}", district, price, numberOfRooms, minSize);
 
         List<Listing> result = listingRepository.findBy(price, district, numberOfRooms, minSize);
         return ResponseEntity.ok(result);
+    }
+
+    @RequestMapping(
+            value = "/criteria",
+            method = RequestMethod.POST,
+            produces = APPLICATION_JSON_UTF8_VALUE,
+            consumes = APPLICATION_FORM_URLENCODED_VALUE
+    )
+    @ResponseBody
+    ResponseEntity<SearchFilter> slackSaveSearchRequest(@RequestBody String body) {
+        String payload = StringUtils.substringAfter(body, "text=");
+        String district = payload.split("&")[0].split("\\+")[0];
+        Float maxPrice = Float.valueOf(payload.split("&")[0].split("\\+")[1]);
+        Float minNumberOfRooms = Float.valueOf(payload.split("&")[0].split("\\+")[2]);
+        Float minSize = Float.valueOf(payload.split("&")[0].split("\\+")[3]);
+
+        SearchFilter filter = SearchFilter.builder()
+                .maxPrice(maxPrice)
+                .district(district)
+                .minNumberOfRooms(minNumberOfRooms)
+                .minSize(minSize)
+                .build();
+
+        LOGGER.info("Saved district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}", district, maxPrice, minNumberOfRooms, minSize);
+
+        searchFilterRepository.save(filter);
+        return ResponseEntity.ok(filter);
     }
 
     @RequestMapping(
