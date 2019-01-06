@@ -26,6 +26,15 @@ public class IS24ListingMapperTest {
 
         Listing listing = mapper.buildDto(element);
 
-        assertThat(listing.getAddress(), is("Danziger Straße 73, Prenzlauer Berg (Prenzlauer Berg), Berlin"));
+        assertThat(listing.getAddress(), is("Danziger Straße 73"));
+    }
+
+    @Test
+    public void mapsDistrict() {
+        Element element = Jsoup.parse("<div class=result-list-entry__address><button title=Auf der Karte anzeigen data-result-id=108208623 class=button-link link-internal result-list-entry__map-link><div class=font-ellipsis>Danziger Straße 73, Prenzlauer Berg (Prenzlauer Berg), Berlin</div></button></div>");
+
+        Listing listing = mapper.buildDto(element);
+
+        assertThat(listing.getDistrict(), is("Prenzlauer Berg"));
     }
 }
