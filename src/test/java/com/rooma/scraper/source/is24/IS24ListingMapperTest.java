@@ -19,7 +19,7 @@ public class IS24ListingMapperTest {
 
         assertThat(listing.getTitle(), is("PARAGON Apartments - 4 Zimmer, EBK, Parkett, und Balkon in Prenzlauer Berg"));
     }
-    
+
     @Test
     public void mapsAddress() {
         Element element = Jsoup.parse("<div class=result-list-entry__address><button title=Auf der Karte anzeigen data-result-id=108208623 class=button-link link-internal result-list-entry__map-link><div class=font-ellipsis>Danziger Straße 73, Prenzlauer Berg (Prenzlauer Berg), Berlin</div></button></div>");
@@ -30,11 +30,20 @@ public class IS24ListingMapperTest {
     }
 
     @Test
-    public void mapsDistrict() {
+    public void mapsDistrictWithTwoWords() {
         Element element = Jsoup.parse("<div class=result-list-entry__address><button title=Auf der Karte anzeigen data-result-id=108208623 class=button-link link-internal result-list-entry__map-link><div class=font-ellipsis>Danziger Straße 73, Prenzlauer Berg (Prenzlauer Berg), Berlin</div></button></div>");
 
         Listing listing = mapper.buildDto(element);
 
         assertThat(listing.getDistrict(), is("Prenzlauer Berg"));
+    }
+
+    @Test
+    public void mapsDistrictWithOneWord() {
+        Element element = Jsoup.parse("<div class=result-list-entry__address><button title=Auf der Karte anzeigen data-result-id=85827703 class=button-link link-internal result-list-entry__map-link><div class=font-ellipsis>Torstraße 131, Mitte (Mitte), Berlin</div></button></div>");
+
+        Listing listing = mapper.buildDto(element);
+
+        assertThat(listing.getDistrict(), is("Mitte"));
     }
 }

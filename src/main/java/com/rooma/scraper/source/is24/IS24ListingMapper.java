@@ -8,7 +8,7 @@ public class IS24ListingMapper {
     public Listing buildDto(Element result) {
         return Listing.builder()
                 .rentalType(RentalType.APARTMENT)
-                .title(result.getElementsByClass("result-list-entry__brand-title").text())
+                .title(getTitle(result))
                 .district(getDistrict(result))
                 .address(getAddress(result))
                 .postcode("")
@@ -22,6 +22,15 @@ public class IS24ListingMapper {
                 .build();
     }
 
+    private String getTitle(Element result) {
+        return result.getElementsByClass("result-list-entry__brand-title").text();
+    }
+//
+//    private float getSize(Element result) {
+//        Element element = result.getElementsByAttribute("result-list-entry__criteria.margin-bottom-s > div > div.grid.grid-flex.gutter-horizontal-l.gutter-vertical-s > dl:nth-child(2) > dd").get(0);
+//        return Float.parseFloat(String.valueOf(element));
+//    }
+
     private String getAddress(Element result) {
         String text = result.getElementsByClass("result-list-entry__address").text();
         return text.split(",")[0];
@@ -29,11 +38,12 @@ public class IS24ListingMapper {
 
     private String getDistrict(Element result) {
         String text = result.getElementsByClass("result-list-entry__address").text();
-        String[] districtElements = text.split(",")[1].trim().split("\\(");
-        if (districtElements.length > 0) {
-            return districtElements[0].trim();
-        } else {
-            return "";
+        if (text.length() > 0) {
+            String districtText = text.split(",")[1];
+            if (districtText.length() > 1 && districtText.split("\\(").length > 1) {
+                return districtText.split("\\(")[0].trim();
+            }
         }
+        return "";
     }
 }
