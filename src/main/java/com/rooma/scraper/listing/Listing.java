@@ -57,4 +57,54 @@ public class Listing {
         }
         modificationDate = LocalDateTime.now();
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "title='" + title + '\'' +
+                ", address='" + address + '\'' +
+                ", size=" + size +
+                ", price=" + price +
+                ", numberOfRooms=" + numberOfRooms +
+                ", url='" + url + '\'' +
+                '}';
+    }
+
+    public String toJson() {
+        return String.format(
+               "{\n" +
+                       "  \"fallback\": \"\",\n" +
+                       "  \"title\": \"%s\",\n" +
+                       "  \"title_link\": \"%s\",\n" +
+                       "  \"fields\": [\n" +
+                       "    {\n" +
+                       "      \"title\": \"Address\",\n" +
+                       "      \"value\": \"%s\",\n" +
+                       "      \"short\": false\n" +
+                       "    },\n" +
+                       "    {\n" +
+                       "      \"title\": \"Size\",\n" +
+                       "      \"value\": \"%.2f\",\n" +
+                       "      \"short\": true\n" +
+                       "    },\n" +
+                       "    {\n" +
+                       "      \"title\": \"Price\",\n" +
+                       "      \"value\": \"%.2f\",\n" +
+                       "      \"short\": true\n" +
+                       "    },\n" +
+                       "    {\n" +
+                       "      \"title\": \"Number of rooms\",\n" +
+                       "      \"value\": \"%.2f\",\n" +
+                       "      \"short\": true\n" +
+                       "    }\n" +
+                       "  ]\n" +
+                       "}",
+                this.title,
+                this.url,
+                this.address,
+                this.size,
+                this.price,
+                this.numberOfRooms
+        );
+    }
 }

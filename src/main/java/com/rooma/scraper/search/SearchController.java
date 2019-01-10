@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
@@ -43,18 +42,17 @@ class SearchController {
         Float numberOfRooms = Float.valueOf(payload.split("&")[0].split("\\+")[2]);
         Float minSize = Float.valueOf(payload.split("&")[0].split("\\+")[3]);
 
-        LOGGER.info("Searched district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}", district, price, numberOfRooms, minSize);
+        LOGGER.info("Searched district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}, raw = {}", district, price, numberOfRooms, minSize, body);
 
         List<Listing> result = listingRepository.findBy(price, district, numberOfRooms, minSize);
 
-        List<SearchResult> searchResults = new ArrayList<>();
+        SlackMarkdownListResponse resp = new SlackMarkdownListResponse();
         for(Listing listing : result) {
-            SearchResult searchResult = mapper.map(listing);
-            searchResults.add(searchResult);
+            resp.add(listing);
         }
 
-        if (searchResults.size() > 0) {
-            return ResponseEntity.ok(searchResults);
+        if (!resp.isEmpty()) {
+            return ResponseEntity.ok(resp.toJson());
         } else {
             return ResponseEntity.ok("No listings are found for your search criteria :cry:");
         }
