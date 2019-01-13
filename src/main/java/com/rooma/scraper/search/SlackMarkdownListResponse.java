@@ -22,7 +22,7 @@ public class SlackMarkdownListResponse {
 
     public String toJson() {
         StringBuilder sb = new StringBuilder();
-        sb.append("{ \"attachments\": [");
+        sb.append("{\"attachments\": [");
         for (Listing listing : this.listings) {
             sb.append(listing.toJson());
             sb.append(",");

@@ -26,7 +26,6 @@ class SearchController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchController.class);
     private final ListingRepository listingRepository;
     private final SearchFilterRepository searchFilterRepository;
-    private ListingToSearchResultMapper mapper = new ListingToSearchResultMapper();
 
     @RequestMapping(
             value = "/district",
