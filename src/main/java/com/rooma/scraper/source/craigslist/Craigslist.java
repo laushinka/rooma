@@ -13,7 +13,7 @@ import java.util.List;
 
 public class Craigslist implements SourceService {
     private ListingMapper listingMapper = new ListingMapper();
-    public static final String NAME = "craigslist";
+    public static final String NAME = "Craigslist";
 
     @Override
     public List<Listing> fetch(String url) {
