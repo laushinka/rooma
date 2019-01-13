@@ -26,6 +26,7 @@ class SlackMarkdownListResponse {
 
     String toJson() throws JsonProcessingException {
         List<SearchResult> searchResultList = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
 
         for (Listing listing : this.listings) {
             SearchResult searchResult = listingMapper.map(listing);
@@ -34,6 +35,50 @@ class SlackMarkdownListResponse {
 
         String stringOfResults = objectMapper.writeValueAsString(searchResultList);
 
-        return "{\"attachments\":" + stringOfResults + "}";
+        stringBuilder.append(stringOfResults);
+
+        String prompt = objectMapper.writeValueAsString(getQuestionPrompt());
+
+        if (stringBuilder.length() > 0) {
+            stringBuilder.deleteCharAt(stringBuilder.length()-1);
+        }
+
+        stringBuilder.append(",");
+        stringBuilder.append(prompt);
+        stringBuilder.append("]");
+
+        return "{\"attachments\":" + stringBuilder + "}";
+    }
+
+    private QuestionPromptToSaveSearch getQuestionPrompt() {
+        return QuestionPromptToSaveSearch.builder()
+                    .fallback("")
+                    .title("Would you like to save your query?")
+                    .text("We can send you notifications when there are new apartments :)")
+                    .callback_id("some_callback_id")
+                    .actions(getActions())
+                    .build();
+    }
+
+    private List<SlackAction> getActions() {
+        List<SlackAction> slackActions = new ArrayList<>();
+        SlackAction saveAction = SlackAction.builder()
+                .name("Save")
+                .text("Yes")
+                .type("button")
+                .value("Positive")
+                .build();
+
+        SlackAction doNotSaveAction = SlackAction.builder()
+                .name("No save")
+                .text("No")
+                .type("button")
+                .value("Negative")
+                .build();
+
+        slackActions.add(saveAction);
+        slackActions.add(doNotSaveAction);
+
+        return slackActions;
     }
 }

@@ -1,5 +1,6 @@
 package com.rooma.scraper.search;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.rooma.scraper.listing.Listing;
 import com.rooma.scraper.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ class SearchController {
             consumes = APPLICATION_FORM_URLENCODED_VALUE
     )
     @ResponseBody
-    ResponseEntity<?> slackSearch(@RequestBody String body) {
+    ResponseEntity<?> slackSearch(@RequestBody String body) throws JsonProcessingException {
         String payload = StringUtils.substringAfter(body, "text=");
         String district = payload.split("&")[0].split("\\+")[0];
         Float price = Float.valueOf(payload.split("&")[0].split("\\+")[1]);
@@ -43,15 +44,15 @@ class SearchController {
 
         LOGGER.info("Searched district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}, raw = {}", district, price, numberOfRooms, minSize, body);
 
-        List<Listing> result = listingRepository.findBy(price, district, numberOfRooms, minSize);
+        List<Listing> searchResult = listingRepository.findBy(price, district, numberOfRooms, minSize);
 
-        SlackMarkdownListResponse resp = new SlackMarkdownListResponse();
-        for(Listing listing : result) {
-            resp.add(listing);
+        SlackMarkdownListResponse response = new SlackMarkdownListResponse();
+        for(Listing listing : searchResult) {
+            response.add(listing);
         }
 
-        if (!resp.isEmpty()) {
-            return ResponseEntity.ok(resp.toJson());
+        if (!response.isEmpty()) {
+            return ResponseEntity.ok(response.toJson());
         } else {
             return ResponseEntity.ok("No listings are found for your search criteria :cry:");
         }
