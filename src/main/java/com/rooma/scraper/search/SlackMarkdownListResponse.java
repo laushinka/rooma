@@ -26,12 +26,19 @@ class SlackMarkdownListResponse {
 
     String toJson() throws JsonProcessingException {
         List<SearchResult> searchResultList = new ArrayList<>();
-        StringBuilder stringBuilder = new StringBuilder();
 
         for (Listing listing : this.listings) {
             SearchResult searchResult = listingMapper.map(listing);
             searchResultList.add(searchResult);
         }
+
+        StringBuilder completedString = process(searchResultList);
+
+        return "{\"attachments\":" + completedString + "}";
+    }
+
+    private StringBuilder process(List<SearchResult> searchResultList) throws JsonProcessingException {
+        StringBuilder stringBuilder = new StringBuilder();
 
         String stringOfResults = objectMapper.writeValueAsString(searchResultList);
 
@@ -40,6 +47,7 @@ class SlackMarkdownListResponse {
         String prompt = objectMapper.writeValueAsString(getQuestionPrompt());
 
         if (stringBuilder.length() > 0) {
+            // to remove the last "]"
             stringBuilder.deleteCharAt(stringBuilder.length()-1);
         }
 
@@ -47,7 +55,7 @@ class SlackMarkdownListResponse {
         stringBuilder.append(prompt);
         stringBuilder.append("]");
 
-        return "{\"attachments\":" + stringBuilder + "}";
+        return stringBuilder;
     }
 
     private QuestionPromptToSaveSearch getQuestionPrompt() {
