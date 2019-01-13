@@ -1,36 +1,39 @@
 package com.rooma.scraper.search;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rooma.scraper.listing.Listing;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SlackMarkdownListResponse {
+class SlackMarkdownListResponse {
     private List<Listing> listings;
+    private ObjectMapper objectMapper = new ObjectMapper();
+    private ListingToSearchResultMapper listingMapper = new ListingToSearchResultMapper();
 
-    public SlackMarkdownListResponse() {
+    SlackMarkdownListResponse() {
         this.listings = new ArrayList<>();
     }
 
-    public void add(Listing listing) {
+    void add(Listing listing) {
         this.listings.add(listing);
     }
 
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return this.listings.size() == 0;
     }
 
-    public String toJson() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\"attachments\": [");
+    String toJson() throws JsonProcessingException {
+        List<SearchResult> searchResultList = new ArrayList<>();
+
         for (Listing listing : this.listings) {
-            sb.append(listing.toJson());
-            sb.append(",");
+            SearchResult searchResult = listingMapper.map(listing);
+            searchResultList.add(searchResult);
         }
-        if (sb.length() > 0) {
-            sb.deleteCharAt(sb.length()-1);
-        }
-        sb.append("] }");
-        return sb.toString();
+
+        String stringOfResults = objectMapper.writeValueAsString(searchResultList);
+
+        return "{\"attachments\":" + stringOfResults + "}";
     }
 }

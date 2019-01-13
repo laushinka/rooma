@@ -1,5 +1,6 @@
 package com.rooma.scraper.search;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.rooma.scraper.RentalType;
 import com.rooma.scraper.listing.Listing;
 import org.junit.Test;
@@ -11,7 +12,7 @@ public class SlackMarkdownListResponseTest {
     private SlackMarkdownListResponse slackMarkdownListResponse = new SlackMarkdownListResponse();
 
     @Test
-    public void convertsToExpectedFormat() {
+    public void convertsToExpectedFormat() throws JsonProcessingException {
         Listing listing = Listing.builder()
                 .rentalType(RentalType.APARTMENT)
                 .title("Some title")
@@ -49,6 +50,6 @@ public class SlackMarkdownListResponseTest {
     }
 
     private String getSlackTestData() {
-        return "{\"attachments\": [{\n  \"fallback\": \"\",\n  \"title\": \"Some title\",\n  \"title_link\": \"null\",\n  \"fields\": [\n    {\n      \"title\": \"Address\",\n      \"value\": \"Some address\",\n      \"short\": false\n    },\n    {\n      \"title\": \"Size\",\n      \"value\": \"55.00\",\n      \"short\": true\n    },\n    {\n      \"title\": \"Price\",\n      \"value\": \"700.00\",\n      \"short\": true\n    },\n    {\n      \"title\": \"Number of rooms\",\n      \"value\": \"2.00\",\n      \"short\": true\n    }\n  ]\n},{\n  \"fallback\": \"\",\n  \"title\": \"Other title\",\n  \"title_link\": \"null\",\n  \"fields\": [\n    {\n      \"title\": \"Address\",\n      \"value\": \"Other address\",\n      \"short\": false\n    },\n    {\n      \"title\": \"Size\",\n      \"value\": \"55.00\",\n      \"short\": true\n    },\n    {\n      \"title\": \"Price\",\n      \"value\": \"700.00\",\n      \"short\": true\n    },\n    {\n      \"title\": \"Number of rooms\",\n      \"value\": \"2.00\",\n      \"short\": true\n    }\n  ]\n}] }";
+        return "{\"attachments\":[{\"fallback\":\"\",\"title\":\"Some title\",\"title_link\":null,\"fields\":[{\"title\":\"Address\",\"value\":\"Some address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]},{\"fallback\":\"\",\"title\":\"Other title\",\"title_link\":null,\"fields\":[{\"title\":\"Address\",\"value\":\"Other address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]}]}";
     }
 }
