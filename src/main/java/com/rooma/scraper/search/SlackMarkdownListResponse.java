@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class SlackMarkdownListResponse {
+    private static final String PROMPT_QUESTION_ID = "prompt_question_id";
     private List<Listing> listings;
     private ObjectMapper objectMapper = new ObjectMapper();
     private ListingToSearchResultMapper listingMapper = new ListingToSearchResultMapper();
@@ -24,7 +25,7 @@ class SlackMarkdownListResponse {
         return this.listings.size() == 0;
     }
 
-    String toJson() throws JsonProcessingException {
+    String toJson(SearchFilter filter) throws JsonProcessingException {
         List<SearchResult> searchResultList = new ArrayList<>();
 
         for (Listing listing : this.listings) {
@@ -32,19 +33,19 @@ class SlackMarkdownListResponse {
             searchResultList.add(searchResult);
         }
 
-        StringBuilder completedString = process(searchResultList);
+        StringBuilder completedString = process(searchResultList, filter);
 
         return "{\"attachments\":" + completedString + "}";
     }
 
-    private StringBuilder process(List<SearchResult> searchResultList) throws JsonProcessingException {
+    private StringBuilder process(List<SearchResult> searchResultList, SearchFilter filter) throws JsonProcessingException {
         StringBuilder stringBuilder = new StringBuilder();
 
         String stringOfResults = objectMapper.writeValueAsString(searchResultList);
 
         stringBuilder.append(stringOfResults);
 
-        String prompt = objectMapper.writeValueAsString(getQuestionPrompt());
+        String prompt = objectMapper.writeValueAsString(getQuestionPrompt(filter));
 
         if (stringBuilder.length() > 0) {
             // to remove the last "]"
@@ -58,30 +59,32 @@ class SlackMarkdownListResponse {
         return stringBuilder;
     }
 
-    private QuestionPromptToSaveSearch getQuestionPrompt() {
+    private QuestionPromptToSaveSearch getQuestionPrompt(SearchFilter filter) throws JsonProcessingException {
         return QuestionPromptToSaveSearch.builder()
                     .fallback("")
                     .title("Would you like to save your query?")
                     .text("We can send you notifications when there are new apartments :)")
-                    .callback_id("some_callback_id")
-                    .actions(getActions())
+                    .callback_id(PROMPT_QUESTION_ID)
+                    .actions(getActions(filter))
                     .build();
     }
 
-    private List<SlackAction> getActions() {
+    private List<SlackAction> getActions(SearchFilter filter) throws JsonProcessingException {
         List<SlackAction> slackActions = new ArrayList<>();
+
         SlackAction saveAction = SlackAction.builder()
                 .name("Save")
                 .text("Yes")
                 .type("button")
-                .value("Positive")
+                .value(objectMapper.writeValueAsString(filter))
                 .build();
 
+//        TODO: No need to send filter instance to no save value
         SlackAction doNotSaveAction = SlackAction.builder()
                 .name("No save")
                 .text("No")
                 .type("button")
-                .value("Negative")
+                .value(objectMapper.writeValueAsString(filter))
                 .build();
 
         slackActions.add(saveAction);
