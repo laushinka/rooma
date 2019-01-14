@@ -41,10 +41,17 @@ public class SlackMarkdownListResponseTest {
                 .isAvailable(true)
                 .build();
 
+        SearchFilter filter = SearchFilter.builder()
+                .district("Some district")
+                .maxPrice(800f)
+                .minNumberOfRooms(1f)
+                .minSize(40f)
+                .build();
+
         slackMarkdownListResponse.add(listing);
         slackMarkdownListResponse.add(listing2);
 
-        String expectedResponse = slackMarkdownListResponse.toJson();
+        String expectedResponse = slackMarkdownListResponse.toJson(filter);
 
         assertThat(expectedResponse, is(getSlackTestData()));
     }

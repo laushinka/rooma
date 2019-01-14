@@ -1,6 +1,7 @@
 package com.rooma.scraper.search;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rooma.scraper.listing.Listing;
 import com.rooma.scraper.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,14 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
@@ -27,6 +24,7 @@ class SearchController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchController.class);
     private final ListingRepository listingRepository;
     private final SearchFilterRepository searchFilterRepository;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @RequestMapping(
             value = "/district",
@@ -45,6 +43,12 @@ class SearchController {
         LOGGER.info("Searched district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}, raw = {}", district, price, numberOfRooms, minSize, body);
 
         List<Listing> searchResult = listingRepository.findBy(price, district, numberOfRooms, minSize);
+        SearchFilter searchFilter = SearchFilter.builder()
+                .district(district)
+                .maxPrice(price)
+                .minNumberOfRooms(numberOfRooms)
+                .minSize(minSize)
+                .build();
 
         SlackMarkdownListResponse response = new SlackMarkdownListResponse();
         for(Listing listing : searchResult) {
@@ -52,7 +56,7 @@ class SearchController {
         }
 
         if (!response.isEmpty()) {
-            return ResponseEntity.ok(response.toJson());
+            return ResponseEntity.ok(response.toJson(searchFilter));
         } else {
             return ResponseEntity.ok("No listings are found for your search criteria :cry:");
         }
@@ -65,24 +69,18 @@ class SearchController {
             consumes = APPLICATION_FORM_URLENCODED_VALUE
     )
     @ResponseBody
-    ResponseEntity<SearchFilter> slackSaveSearchRequest(@RequestBody String body) {
-        String payload = StringUtils.substringAfter(body, "text=");
-        String district = payload.split("&")[0].split("\\+")[0];
-        Float maxPrice = Float.valueOf(payload.split("&")[0].split("\\+")[1]);
-        Float minNumberOfRooms = Float.valueOf(payload.split("&")[0].split("\\+")[2]);
-        Float minSize = Float.valueOf(payload.split("&")[0].split("\\+")[3]);
+    ResponseEntity<SearchFilter> slackSaveSearchRequest(@RequestBody String body) throws IOException {
+        String decodedResponse = URLDecoder.decode(body, "UTF-8");
+        String result = StringUtils.substringBetween(decodedResponse, "\"value\":\"", "\"}],\"callback_id\"");
+        String tidiedResult = result.replaceAll("\\\\", "");
 
-        SearchFilter filter = SearchFilter.builder()
-                .maxPrice(maxPrice)
-                .district(district)
-                .minNumberOfRooms(minNumberOfRooms)
-                .minSize(minSize)
-                .build();
+        SearchFilter searchFilter = objectMapper.readValue(tidiedResult, SearchFilter.class);
 
-        LOGGER.info("Saved district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}", district, maxPrice, minNumberOfRooms, minSize);
+//        TODO: Extract user_name and persist as SearchFilter field
+        searchFilterRepository.save(searchFilter);
+        logSearchFilter(searchFilter);
 
-        searchFilterRepository.save(filter);
-        return ResponseEntity.ok(filter);
+        return ResponseEntity.ok(searchFilter);
     }
 
     @RequestMapping(
@@ -96,5 +94,13 @@ class SearchController {
                                          @RequestParam(required = false, defaultValue = "1") Float minSize) {
         List<Listing> result = listingRepository.findBy(maxPrice, district, minNumberOfRooms, minSize);
         return ResponseEntity.ok(result);
+    }
+
+    private void logSearchFilter(SearchFilter searchFilter) {
+        LOGGER.info("Saved query -> district {}, maxPrice {}, rooms {}, minSize {}",
+                searchFilter.getDistrict(),
+                searchFilter.getMaxPrice(),
+                searchFilter.getMinNumberOfRooms(),
+                searchFilter.getMinNumberOfRooms());
     }
 }
