@@ -34,4 +34,14 @@ public class SearchFilter {
     private Float maxPrice;
     private Float minSize;
     private String district;
+
+    @Override
+    public String toString() {
+        return "SearchFilter{" +
+                ", minNumberOfRooms=" + minNumberOfRooms +
+                ", maxPrice=" + maxPrice +
+                ", minSize=" + minSize +
+                ", district='" + district + '\'' +
+                '}';
+    }
 }
