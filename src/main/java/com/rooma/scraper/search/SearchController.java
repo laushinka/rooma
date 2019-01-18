@@ -9,18 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
@@ -28,14 +21,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 @RestController
 @RequiredArgsConstructor
 class SearchController {
-    private static final String PROMPT_QUESTION_ID = "prompt_question_id";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchController.class);
     private final ListingRepository listingRepository;
     private final SearchFilterRepository searchFilterRepository;
     private ObjectMapper objectMapper = new ObjectMapper();
-    private Map<String, SlackMarkdownListResponse> cache = new HashMap<>();
-
 
     @RequestMapping(
             value = "/district",
@@ -67,10 +56,7 @@ class SearchController {
         }
 
         if (!response.isEmpty()) {
-            this.cache.put(searchFilter.toString(), response);
-            String prompt = objectMapper.writeValueAsString(getQuestionPrompt(searchFilter));
-
-            return ResponseEntity.ok(response.toJson(searchFilter, prompt));
+            return ResponseEntity.ok(response.toJson(searchFilter));
         } else {
             return ResponseEntity.ok("No listings are found for your search criteria :cry:");
         }
@@ -83,7 +69,7 @@ class SearchController {
             consumes = APPLICATION_FORM_URLENCODED_VALUE
     )
     @ResponseBody
-    ResponseEntity<?> slackSaveSearchRequest(@RequestBody String body) throws IOException {
+    ResponseEntity<SearchFilter> slackSaveSearchRequest(@RequestBody String body) throws IOException {
         String decodedResponse = URLDecoder.decode(body, "UTF-8");
         String result = StringUtils.substringBetween(decodedResponse, "\"value\":\"", "\"}],\"callback_id\"");
         String tidiedResult = result.replaceAll("\\\\", "");
@@ -92,56 +78,29 @@ class SearchController {
 
 //        TODO: Extract user_name and persist as SearchFilter field
         searchFilterRepository.save(searchFilter);
+        logSearchFilter(searchFilter);
 
-        LOGGER.info("Saved query -> district {}, maxPrice {}, rooms {}, minSize {}, rawBody {}",
+        return ResponseEntity.ok(searchFilter);
+    }
+
+    @RequestMapping(
+            value = "/district/{district}",
+            method = RequestMethod.GET,
+            produces = APPLICATION_JSON_UTF8_VALUE
+    )
+    ResponseEntity<List<Listing>> search(@PathVariable String district,
+                                         @RequestParam(required = false, defaultValue = "100000") Float maxPrice,
+                                         @RequestParam(required = false, defaultValue = "1") Float minNumberOfRooms,
+                                         @RequestParam(required = false, defaultValue = "1") Float minSize) {
+        List<Listing> result = listingRepository.findBy(maxPrice, district, minNumberOfRooms, minSize);
+        return ResponseEntity.ok(result);
+    }
+
+    private void logSearchFilter(SearchFilter searchFilter) {
+        LOGGER.info("Saved query -> district {}, maxPrice {}, rooms {}, minSize {}",
                 searchFilter.getDistrict(),
                 searchFilter.getMaxPrice(),
                 searchFilter.getMinNumberOfRooms(),
-                searchFilter.getMinNumberOfRooms(),
-                body);
-
-        SlackMarkdownListResponse response = this.cache.get(searchFilter.toString());
-        if (response == null) {
-            return ResponseEntity.ok(new SlackMarkdownListResponse());
-        }
-        else {
-            this.cache.remove(searchFilter.toString());
-        }
-
-        return ResponseEntity.ok(response.toJson(searchFilter, ""));
-    }
-
-    private QuestionPromptToSaveSearch getQuestionPrompt(SearchFilter filter) throws JsonProcessingException {
-        return QuestionPromptToSaveSearch.builder()
-                .fallback("")
-                .title("Would you like to save your query?")
-                .text("We can send you notifications when there are new apartments :)")
-                .callback_id(PROMPT_QUESTION_ID)
-                .actions(getActions(filter))
-                .build();
-    }
-
-    private List<SlackAction> getActions(SearchFilter filter) throws JsonProcessingException {
-        List<SlackAction> slackActions = new ArrayList<>();
-
-        SlackAction saveAction = SlackAction.builder()
-                .name("Save")
-                .text("Yes")
-                .type("button")
-                .value(objectMapper.writeValueAsString(filter))
-                .build();
-
-//        TODO: No need to send filter instance to no save value
-        SlackAction doNotSaveAction = SlackAction.builder()
-                .name("No save")
-                .text("No")
-                .type("button")
-                .value(objectMapper.writeValueAsString(filter))
-                .build();
-
-        slackActions.add(saveAction);
-        slackActions.add(doNotSaveAction);
-
-        return slackActions;
+                searchFilter.getMinNumberOfRooms());
     }
 }
