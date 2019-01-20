@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rooma.scraper.listing.Listing;
 import com.rooma.scraper.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,23 +37,18 @@ class SearchController {
     )
     @ResponseBody
     ResponseEntity<?> slackSearch(@RequestBody String body) throws JsonProcessingException {
-        String payload = StringUtils.substringAfter(body, "text=");
-        String district = payload.split("&")[0].split("\\+")[0];
-        Float price = Float.valueOf(payload.split("&")[0].split("\\+")[1]);
-        Float numberOfRooms = Float.valueOf(payload.split("&")[0].split("\\+")[2]);
-        Float minSize = Float.valueOf(payload.split("&")[0].split("\\+")[3]);
+        LOGGER.info("Raw -> {}", body);
 
-        LOGGER.info("Searched district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}, raw = {}", district, price, numberOfRooms, minSize, body);
+        SearchFilter searchFilter = SearchFilter.buildFilterFromSearchRequestPayload(body);
 
-        List<Listing> searchResult = listingRepository.findBy(price, district, numberOfRooms, minSize);
-        SearchFilter searchFilter = SearchFilter.builder()
-                .district(district)
-                .maxPrice(price)
-                .minNumberOfRooms(numberOfRooms)
-                .minSize(minSize)
-                .build();
+        List<Listing> searchResult = listingRepository.findBy(
+                searchFilter.getMaxPrice(),
+                searchFilter.getDistrict(),
+                searchFilter.getMinNumberOfRooms(),
+                searchFilter.getMinSize());
 
         SlackMarkdownListResponse response = new SlackMarkdownListResponse();
+
         for(Listing listing : searchResult) {
             response.add(listing);
         }
@@ -77,11 +70,8 @@ class SearchController {
     )
     @ResponseBody
     ResponseEntity<?> slackSaveSearchRequest(@RequestBody String body) throws IOException {
-        String decodedResponse = URLDecoder.decode(body, "UTF-8");
-        String result = StringUtils.substringBetween(decodedResponse, "\"value\":\"", "\"}],\"callback_id\"");
-        String tidiedResult = result.replaceAll("\\\\", "");
-
-        SearchFilter searchFilter = objectMapper.readValue(tidiedResult, SearchFilter.class);
+        String result = SearchFilter.buildFilterFromSaveRequestPayload(body);
+        SearchFilter searchFilter = objectMapper.readValue(result, SearchFilter.class);
 
 //        TODO: Extract user_name and persist as SearchFilter field
         searchFilterRepository.save(searchFilter);
@@ -95,8 +85,6 @@ class SearchController {
         }
         return ResponseEntity.ok(response.toJson(searchFilter, ""));
     }
-
-
 
     private QuestionPromptToSaveSearch getQuestionPrompt(SearchFilter filter) throws JsonProcessingException {
         return QuestionPromptToSaveSearch.builder()
