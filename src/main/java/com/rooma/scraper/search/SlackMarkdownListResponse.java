@@ -79,12 +79,11 @@ class SlackMarkdownListResponse {
                 .value(objectMapper.writeValueAsString(filter))
                 .build();
 
-//        TODO: No need to send filter instance to no save value
         SlackAction doNotSaveAction = SlackAction.builder()
                 .name("No save")
                 .text("No")
                 .type("button")
-                .value(objectMapper.writeValueAsString(filter))
+                .value("Nothing")
                 .build();
 
         slackActions.add(saveAction);

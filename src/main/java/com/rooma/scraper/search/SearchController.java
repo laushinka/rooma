@@ -78,29 +78,17 @@ class SearchController {
 
 //        TODO: Extract user_name and persist as SearchFilter field
         searchFilterRepository.save(searchFilter);
-        logSearchFilter(searchFilter);
+        logSearchFilter(searchFilter, body);
 
         return ResponseEntity.ok(searchFilter);
     }
 
-    @RequestMapping(
-            value = "/district/{district}",
-            method = RequestMethod.GET,
-            produces = APPLICATION_JSON_UTF8_VALUE
-    )
-    ResponseEntity<List<Listing>> search(@PathVariable String district,
-                                         @RequestParam(required = false, defaultValue = "100000") Float maxPrice,
-                                         @RequestParam(required = false, defaultValue = "1") Float minNumberOfRooms,
-                                         @RequestParam(required = false, defaultValue = "1") Float minSize) {
-        List<Listing> result = listingRepository.findBy(maxPrice, district, minNumberOfRooms, minSize);
-        return ResponseEntity.ok(result);
-    }
-
-    private void logSearchFilter(SearchFilter searchFilter) {
-        LOGGER.info("Saved query -> district {}, maxPrice {}, rooms {}, minSize {}",
+    private void logSearchFilter(SearchFilter searchFilter, String body) {
+        LOGGER.info("Saved query -> district {}, maxPrice {}, rooms {}, minSize {}, rawBody {}",
                 searchFilter.getDistrict(),
                 searchFilter.getMaxPrice(),
                 searchFilter.getMinNumberOfRooms(),
-                searchFilter.getMinNumberOfRooms());
+                searchFilter.getMinNumberOfRooms(),
+                body);
     }
 }
