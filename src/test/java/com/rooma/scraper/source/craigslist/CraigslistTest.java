@@ -15,6 +15,6 @@ public class CraigslistTest {
     public void fetchesAllListings() {
         List<Listing> listings = craigslist.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");
 
-        assertThat(listings.size(), is(281));
+        assertThat(listings.size() > 0, is(true));
     }
 }
