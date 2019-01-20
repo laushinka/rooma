@@ -51,7 +51,7 @@ public class SlackMarkdownListResponseTest {
         slackMarkdownListResponse.add(listing);
         slackMarkdownListResponse.add(listing2);
 
-        String expectedResponse = slackMarkdownListResponse.toJson(filter);
+        String expectedResponse = slackMarkdownListResponse.toJson(filter,"");
 
         assertThat(expectedResponse, is(getSlackTestData()));
     }
