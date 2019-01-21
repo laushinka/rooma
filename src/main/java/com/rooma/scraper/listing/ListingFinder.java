@@ -54,6 +54,7 @@ public class ListingFinder {
                 .minNumberOfRooms(2f)
                 .maxPrice(800f)
                 .minSize(40f)
+                .slackUserId("UF25WAA8L")
                 .build();
     }
 }
