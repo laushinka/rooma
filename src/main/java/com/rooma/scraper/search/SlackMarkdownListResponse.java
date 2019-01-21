@@ -24,7 +24,7 @@ class SlackMarkdownListResponse {
         return this.listings.size() == 0;
     }
 
-    String toJson(SearchFilter filter, String prompt) throws JsonProcessingException {
+    String toJson(String prompt) throws JsonProcessingException {
         List<SearchResult> searchResultList = new ArrayList<>();
 
         for (Listing listing : this.listings) {
@@ -32,12 +32,12 @@ class SlackMarkdownListResponse {
             searchResultList.add(searchResult);
         }
 
-        StringBuilder completedString = process(searchResultList, filter, prompt);
+        StringBuilder completedString = process(searchResultList, prompt);
 
         return "{\"attachments\":" + completedString + "}";
     }
 
-    private StringBuilder process(List<SearchResult> searchResultList, SearchFilter filter, String prompt) throws JsonProcessingException {
+    private StringBuilder process(List<SearchResult> searchResultList, String prompt) throws JsonProcessingException {
         StringBuilder stringBuilder = new StringBuilder();
 
         String stringOfResults = objectMapper.writeValueAsString(searchResultList);

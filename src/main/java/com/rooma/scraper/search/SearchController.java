@@ -56,7 +56,7 @@ class SearchController {
         if (!response.isEmpty()) {
             this.cache.put(searchFilter.toString(), response);
             String prompt = objectMapper.writeValueAsString(getQuestionPrompt(searchFilter));
-            return ResponseEntity.ok(response.toJson(searchFilter, prompt));
+            return ResponseEntity.ok(response.toJson(prompt));
         } else {
             return ResponseEntity.ok("No listings are found for your search criteria :cry:");
         }
@@ -73,7 +73,6 @@ class SearchController {
         String result = SearchFilter.buildFilterFromSaveRequestPayload(body);
         SearchFilter searchFilter = objectMapper.readValue(result, SearchFilter.class);
 
-//        TODO: Extract user_name and persist as SearchFilter field
         searchFilterRepository.save(searchFilter);
         logSearchFilter(searchFilter, body);
 
@@ -83,7 +82,7 @@ class SearchController {
         } else {
             this.cache.remove(searchFilter.toString());
         }
-        return ResponseEntity.ok(response.toJson(searchFilter, ""));
+        return ResponseEntity.ok(response.toJson(""));
     }
 
     private QuestionPromptToSaveSearch getQuestionPrompt(SearchFilter filter) throws JsonProcessingException {
@@ -120,11 +119,12 @@ class SearchController {
     }
 
     private void logSearchFilter(SearchFilter searchFilter, String body) {
-        LOGGER.info("Saved query -> district {}, maxPrice {}, rooms {}, minSize {}, rawBody {}",
+        LOGGER.info("Saved query -> district {}, maxPrice {}, rooms {}, minSize {}, slackId {}, rawBody {}",
                 searchFilter.getDistrict(),
                 searchFilter.getMaxPrice(),
                 searchFilter.getMinNumberOfRooms(),
                 searchFilter.getMinNumberOfRooms(),
+                searchFilter.getSlackUserId(),
                 body);
     }
 }

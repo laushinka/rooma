@@ -41,6 +41,7 @@ public class SearchFilter {
     private Float maxPrice;
     private Float minSize;
     private String district;
+    private String slackUserId;
 
     @Override
     public String toString() {
@@ -59,14 +60,16 @@ public class SearchFilter {
         Float price = Float.valueOf(payload.split("&")[0].split("\\+")[1]);
         Float numberOfRooms = Float.valueOf(payload.split("&")[0].split("\\+")[2]);
         Float minSize = Float.valueOf(payload.split("&")[0].split("\\+")[3]);
+        String slackUserId = StringUtils.substringBetween(body, "user_id=", "&user_name");
 
-        LOGGER.info("Searched district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}", district, price, numberOfRooms, minSize);
+        LOGGER.info("Searched district = {}, maxPrice = {}, numberOfRooms = {}, minSize = {}, slackId = {}", district, price, numberOfRooms, minSize, slackUserId);
 
         return SearchFilter.builder()
                 .district(district)
                 .maxPrice(price)
                 .minNumberOfRooms(numberOfRooms)
                 .minSize(minSize)
+                .slackUserId(slackUserId)
                 .build();
     }
 
