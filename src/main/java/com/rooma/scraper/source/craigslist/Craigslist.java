@@ -1,5 +1,7 @@
-package com.rooma.scraper;
+package com.rooma.scraper.source.craigslist;
 
+import com.rooma.scraper.listing.Listing;
+import com.rooma.scraper.source.SourceService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,8 +11,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Craigslist implements Source {
-    private CraigslistToListingMapper listingMapper = new CraigslistToListingMapper();
+public class Craigslist implements SourceService {
+    private ListingMapper listingMapper = new ListingMapper();
+    public static final String NAME = "Craigslist";
 
     @Override
     public List<Listing> fetch(String url) {
@@ -34,7 +37,7 @@ public class Craigslist implements Source {
 
     @Override
     public String name() {
-        return SourceName.CRAIGSLIST.name();
+        return Craigslist.NAME;
     }
 
     private void processDocuments(List<Document> listOfDocuments, List<Listing> listingList) {

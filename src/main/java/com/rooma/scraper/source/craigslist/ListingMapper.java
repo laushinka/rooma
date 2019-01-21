@@ -1,13 +1,16 @@
-package com.rooma.scraper;
+package com.rooma.scraper.source.craigslist;
 
+import com.rooma.scraper.helper.BerlinDistricts;
+import com.rooma.scraper.listing.Listing;
+import com.rooma.scraper.RentalType;
 import org.jsoup.nodes.Element;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-import static com.rooma.scraper.BerlinDistricts.convertCommonMisspelling;
+import static com.rooma.scraper.helper.BerlinDistricts.convertCommonMisspelling;
 
-public class CraigslistToListingMapper {
+public class ListingMapper {
     public Listing buildDto(Element result) {
         return Listing.builder()
                 .rentalType(RentalType.APARTMENT)
@@ -20,7 +23,7 @@ public class CraigslistToListingMapper {
                 .numberOfRooms(getNumberOfRooms(result))
                 .url(result.getElementsByClass("result-title hdrlnk").attr("href"))
                 .imageUrl(result.getElementsByAttribute("img").text())
-                .source(SourceName.CRAIGSLIST)
+                .source(Craigslist.NAME)
                 .isAvailable(true)
                 .build();
     }
@@ -43,7 +46,7 @@ public class CraigslistToListingMapper {
         String[] splitAddress = completeAddress.split("\\.|,|-|/|\\s+");
         if (splitAddress.length > 0) {
             for (String district : splitAddress) {
-                Optional<String> foundDistrict = Arrays.stream(BerlinDistricts.getBerlinDistricts())
+                Optional<String> foundDistrict = Arrays.stream(BerlinDistricts.getNames())
                         .filter(d -> d.equals(district.trim().toLowerCase()))
                         .findFirst();
                 if (foundDistrict.isPresent()) {
