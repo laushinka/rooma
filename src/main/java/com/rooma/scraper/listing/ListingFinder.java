@@ -16,20 +16,26 @@ public class ListingFinder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ListingFinder.class);
     private ListingRepository listingRepository;
     private SearchFilterRepository searchFilterRepository;
+    private int processed;
 
     @Scheduled(initialDelay = 3000, cron = "0 */12 * * *")
     void loadListingsJob() {
-        List<Listing> results = null;
-        SearchFilter filter = processFilters();
         try {
-            results = getFilterResults(filter);
-            LOGGER.info("Found listings {}", results.size());
+            checkAgainstAllSavedFilters();
+            LOGGER.info("Found listings {}", processed);
         } catch (Exception e) {
             LOGGER.info("Could not load listings {}", e.getMessage());
         }
+    }
 
-        if (results == null) {
-            LOGGER.info("No listings found");
+    private void checkAgainstAllSavedFilters() {
+        List<SearchFilter> all = searchFilterRepository.findAll();
+        for (SearchFilter filter : all) {
+            List<Listing> newResults = getFilterResults(filter);
+            if (newResults != null && newResults.size() > 0) {
+                processFilters(newResults, filter.getSlackUserId());
+                processed ++;
+            }
         }
     }
 
@@ -41,22 +47,7 @@ public class ListingFinder {
                 filter.getMinSize());
     }
 
-    // TODO: This dummy flow won't be used anymore. Instead:
-    // 1. Go through every searchFilter in the database
-    // 2. For every filter, find if there are new listings (maybe newer than the past 12 hours?)
-    //      in the database
-    // 3. If new ones are found, send to slackUserId
-    private SearchFilter processFilters() {
-        return getFilter();
-    }
-
-    private SearchFilter getFilter() {
-        return SearchFilter.builder()
-                .district("mitte")
-                .minNumberOfRooms(2f)
-                .maxPrice(800f)
-                .minSize(40f)
-                .slackUserId("UF25WAA8L")
-                .build();
+    private void processFilters(List<Listing> newResults, String slackUserId) {
+        // send to slackUserId
     }
 }
