@@ -17,7 +17,7 @@ public class ListingFinder {
     private ListingRepository listingRepository;
     private SearchFilterRepository searchFilterRepository;
 
-    @Scheduled(initialDelay = 3000, fixedDelay = 1000000000)
+    @Scheduled(initialDelay = 3000, cron = "0 */12 * * *")
     void loadListingsJob() {
         List<Listing> results = null;
         SearchFilter filter = processFilters();
@@ -34,18 +34,20 @@ public class ListingFinder {
     }
 
     private List<Listing> getFilterResults(SearchFilter filter) {
-        return listingRepository.findBy(
+        return listingRepository.findNewListingsBy(
                 filter.getMaxPrice(),
                 filter.getDistrict(),
                 filter.getMinNumberOfRooms(),
                 filter.getMinSize());
     }
 
+    // TODO: This dummy flow won't be used anymore. Instead:
+    // 1. Go through every searchFilter in the database
+    // 2. For every filter, find if there are new listings (maybe newer than the past 12 hours?)
+    //      in the database
+    // 3. If new ones are found, send to slackUserId
     private SearchFilter processFilters() {
-        SearchFilter filter = getFilter();
-        searchFilterRepository.save(filter);
-        LOGGER.info("Saved filter {}");
-        return filter;
+        return getFilter();
     }
 
     private SearchFilter getFilter() {
