@@ -23,7 +23,7 @@ public interface ListingRepository extends Repository<Listing, Long> {
                          @Param("minSize") Float minSize
     );
 
-    @Query(value = "FROM Listing l WHERE l.price <= :maxPrice AND l.district like :district AND l.numberOfRooms >= :minNumberOfRooms AND l.size >= :minSize AND l.creationDate >= DATEADD(HOUR, -12, now())")
+    @Query(value = "FROM Listing l WHERE l.price <= :maxPrice AND l.district like :district AND l.numberOfRooms >= :minNumberOfRooms AND l.size >= :minSize AND l.creationDate >= DATE_SUB(NOW(), INTERVAL 12 HOUR)")
     List<Listing> findNewListingsBy(@Param("maxPrice") Float maxPrice,
                          @Param("district") String district,
                          @Param("minNumberOfRooms") Float numberOfRooms,
