@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -49,7 +50,9 @@ public class ListingFinder {
                 filter.getMaxPrice(),
                 filter.getDistrict(),
                 filter.getMinNumberOfRooms(),
-                filter.getMinSize());
+                filter.getMinSize(),
+                LocalDateTime.now().minusHours(5)
+        );
     }
 
     private void processFilters() throws UnirestException {
