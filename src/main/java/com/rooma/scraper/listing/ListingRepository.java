@@ -6,6 +6,7 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ListingRepository extends Repository<Listing, Long> {
@@ -23,10 +24,10 @@ public interface ListingRepository extends Repository<Listing, Long> {
                          @Param("minSize") Float minSize
     );
 
-    @Query(value = "FROM Listing l WHERE l.price <= :maxPrice AND l.district like :district AND l.numberOfRooms >= :minNumberOfRooms AND l.size >= :minSize AND l.creationDate >= DATE_SUB(NOW(), INTERVAL 12 HOUR)")
+    @Query(value = "FROM Listing l WHERE l.price <= :maxPrice AND l.district like :district AND l.numberOfRooms >= :minNumberOfRooms AND l.size >= :minSize AND l.creationDate >= :creationDate")
     List<Listing> findNewListingsBy(@Param("maxPrice") Float maxPrice,
-                         @Param("district") String district,
-                         @Param("minNumberOfRooms") Float numberOfRooms,
-                         @Param("minSize") Float minSize
-    );
+                                    @Param("district") String district,
+                                    @Param("minNumberOfRooms") Float numberOfRooms,
+                                    @Param("minSize") Float minSize,
+                                    @Param("creationDate")LocalDateTime creationDate);
 }
