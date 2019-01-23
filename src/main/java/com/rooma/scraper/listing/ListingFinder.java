@@ -23,6 +23,7 @@ public class ListingFinder {
     @Scheduled(initialDelay = 3000, fixedDelay = 120000)
     void loadListingsJob() {
         try {
+            processFilters(); // Just to try to see if the http call is made
             checkAgainstAllSavedFilters();
             LOGGER.info("Found listings {}");
         } catch (Exception e) {
@@ -58,18 +59,10 @@ public class ListingFinder {
     private void processFilters() throws UnirestException {
         Unirest.post("https://slack.com/api/chat.postMessage")
                 .header("accept", "application/json")
-                .body("{\n" +
-                        "    \"ok\": true,\n" +
-                        "    \"channel\": \"DF1NHMYJD\",\n" +
-                        "    \"ts\": \"1548163280.000100\",\n" +
-                        "    \"message\": {\n" +
-                        "        \"bot_id\": \"BFJMYMT25\",\n" +
-                        "        \"type\": \"message\",\n" +
-                        "        \"text\": \"Another try\",\n" +
-                        "        \"user\": \"UF25WAA8L\",\n" +
-                        "        \"ts\": \"1548163280.000100\"\n" +
-                        "    }\n" +
-                        "}")
+                .queryString("token", "xoxp-512569703077-512200350292-528746738721-ad8bd5686dbda6adb3c24e453af061b0")
+                .queryString("channel", "UF25WAA8L")
+                .queryString("text", "Sent from the application")
+                .queryString("pretty", "1")
                 .asJson();
     }
 }
