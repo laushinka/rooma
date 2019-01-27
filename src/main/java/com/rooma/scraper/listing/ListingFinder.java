@@ -20,10 +20,9 @@ public class ListingFinder {
     private ListingRepository listingRepository;
     private SearchFilterRepository searchFilterRepository;
 
-    @Scheduled(initialDelay = 3000, fixedDelay = 120000)
+    @Scheduled(initialDelay = 5000, fixedDelay = 120000)
     void loadListingsJob() {
         try {
-            processFilters(); // Just to try to see if the http call is made
             checkAgainstAllSavedFilters();
             LOGGER.info("Found listings {}");
         } catch (Exception e) {
@@ -35,10 +34,12 @@ public class ListingFinder {
         int processed = 0;
         List<SearchFilter> all = searchFilterRepository.findAll();
         for (SearchFilter filter : all) {
+            LOGGER.info("Saved filter {}", filter);
             List<Listing> newResults = getFilterResults(filter);
             if (newResults != null && newResults.size() > 0) {
                 processFilters();
                 processed ++;
+                LOGGER.info("Number of new listings {}", newResults);
                 LOGGER.info("Call made to Slack with number of processed {}", processed);
             } else {
                 LOGGER.info("No new listings yet");
@@ -52,7 +53,7 @@ public class ListingFinder {
                 filter.getDistrict(),
                 filter.getMinNumberOfRooms(),
                 filter.getMinSize(),
-                LocalDateTime.now().minusHours(5)
+                LocalDateTime.now().minusHours(1)
         );
     }
 
