@@ -7,24 +7,24 @@ import com.rooma.scraper.listing.Listing;
 import java.util.ArrayList;
 import java.util.List;
 
-class SlackMarkdownListResponse {
+public class SlackMarkdownListResponse {
     private List<Listing> listings;
     private ObjectMapper objectMapper = new ObjectMapper();
     private ListingToSearchResultMapper listingMapper = new ListingToSearchResultMapper();
 
-    SlackMarkdownListResponse() {
+    public SlackMarkdownListResponse() {
         this.listings = new ArrayList<>();
     }
 
-    void add(Listing listing) {
+    public void add(Listing listing) {
         this.listings.add(listing);
     }
 
-    boolean isEmpty() {
+    public boolean isEmpty() {
         return this.listings.size() == 0;
     }
 
-    String toJson(String prompt) throws JsonProcessingException {
+    public String toStringOfAttachmentValues(String prompt) throws JsonProcessingException {
         List<SearchResult> searchResultList = new ArrayList<>();
 
         for (Listing listing : this.listings) {
@@ -32,9 +32,7 @@ class SlackMarkdownListResponse {
             searchResultList.add(searchResult);
         }
 
-        StringBuilder completedString = process(searchResultList, prompt);
-
-        return "{\"attachments\":" + completedString + "}";
+        return String.valueOf(process(searchResultList, prompt));
     }
 
     private StringBuilder process(List<SearchResult> searchResultList, String prompt) throws JsonProcessingException {
