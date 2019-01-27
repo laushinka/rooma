@@ -44,12 +44,12 @@ public class SlackMarkdownListResponseTest {
         slackMarkdownListResponse.add(listing);
         slackMarkdownListResponse.add(listing2);
 
-        String expectedResponse = slackMarkdownListResponse.toStringOfAttachmentValues("");
+        String expectedAttachment = slackMarkdownListResponse.toStringOfAttachmentValues("");
 
-        assertThat(expectedResponse, is(getSlackTestData()));
+        assertThat(expectedAttachment, is(getSlackTestData()));
     }
 
     private String getSlackTestData() {
-        return "{\"attachments\":[{\"fallback\":\"\",\"title\":\"Some title\",\"title_link\":null,\"fields\":[{\"title\":\"Address\",\"value\":\"Some address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]},{\"fallback\":\"\",\"title\":\"Other title\",\"title_link\":null,\"fields\":[{\"title\":\"Address\",\"value\":\"Other address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]}]}";
+        return "[{\"fallback\":\"\",\"title\":\"Some title\",\"title_link\":null,\"fields\":[{\"title\":\"Address\",\"value\":\"Some address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]},{\"fallback\":\"\",\"title\":\"Other title\",\"title_link\":null,\"fields\":[{\"title\":\"Address\",\"value\":\"Other address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]}]";
     }
 }
