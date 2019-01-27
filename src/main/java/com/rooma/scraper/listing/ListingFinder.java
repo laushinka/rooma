@@ -46,7 +46,7 @@ public class ListingFinder {
                 String attachment = processFilterResultsAndConvertToAcceptedFormat(newResults);
                 if (attachment != null) {
                     sendToSlack(attachment, filter.getSlackUserId());
-                    LOGGER.info("Sent to Slack {} number of new results", newResults.size());
+                    LOGGER.info("Sent to Slack {} new results", newResults.size());
                 }
             } else {
                 LOGGER.info("No new listings yet");
