@@ -1,9 +1,11 @@
 package com.rooma.scraper.listing;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.rooma.scraper.search.SearchFilter;
 import com.rooma.scraper.search.SearchFilterRepository;
+import com.rooma.scraper.search.SlackMarkdownListResponse;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,26 +23,32 @@ public class ListingFinder {
     private SearchFilterRepository searchFilterRepository;
 
     @Scheduled(initialDelay = 5000, fixedDelay = 120000)
-    void loadListingsJob() {
+    void notificationJob() {
         try {
-            checkAgainstAllSavedFilters();
+            handleNotificationJob();
             LOGGER.info("Found listings {}");
         } catch (Exception e) {
-            LOGGER.info("Could not load listings {}", e.getMessage());
+            LOGGER.info("Exception from possibly too large content {}", e.getMessage());
         }
     }
 
-    private void checkAgainstAllSavedFilters() throws UnirestException {
-        int processed = 0;
-        List<SearchFilter> all = searchFilterRepository.findAll();
-        for (SearchFilter filter : all) {
+    private void handleNotificationJob() throws UnirestException, JsonProcessingException {
+        List<SearchFilter> filtersFound = searchFilterRepository.findAll();
+        if (filtersFound.size() > 0) {
+            processFiltersFound(filtersFound);
+        }
+    }
+
+    private void processFiltersFound(List<SearchFilter> filtersFound) throws UnirestException, JsonProcessingException {
+        for (SearchFilter filter : filtersFound) {
             LOGGER.info("Saved filter {}", filter);
             List<Listing> newResults = getFilterResults(filter);
             if (newResults != null && newResults.size() > 0) {
-                processFilters();
-                processed ++;
-                LOGGER.info("Number of new listings {}", newResults);
-                LOGGER.info("Call made to Slack with number of processed {}", processed);
+                String attachment = processFilterResultsAndConvertToAcceptedFormat(newResults);
+                if (attachment != null) {
+                    sendToSlack(attachment);
+                    LOGGER.info("Sent to Slack {} number of new results", newResults.size());
+                }
             } else {
                 LOGGER.info("No new listings yet");
             }
@@ -57,12 +65,27 @@ public class ListingFinder {
         );
     }
 
-    private void processFilters() throws UnirestException {
+    private String processFilterResultsAndConvertToAcceptedFormat(List<Listing> newResults) throws JsonProcessingException {
+        String attachmentValue;
+        SlackMarkdownListResponse response = new SlackMarkdownListResponse();
+        for(Listing listing : newResults) {
+            response.add(listing);
+        }
+        if (!response.isEmpty()) {
+            attachmentValue = response.toStringOfAttachmentValues("");
+        } else {
+            return null;
+        }
+        return attachmentValue;
+    }
+
+    private void sendToSlack(String attachment) throws UnirestException {
         Unirest.post("https://slack.com/api/chat.postMessage")
                 .header("accept", "application/json")
                 .queryString("token", "xoxp-512569703077-512200350292-528746738721-ad8bd5686dbda6adb3c24e453af061b0")
                 .queryString("channel", "UF25WAA8L")
-                .queryString("text", "Sent from the application")
+                .queryString("text", "This is what we found for your search:")
+                .queryString("attachments", attachment)
                 .queryString("pretty", "1")
                 .asJson();
     }

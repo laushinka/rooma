@@ -56,7 +56,9 @@ class SearchController {
         if (!response.isEmpty()) {
             this.cache.put(searchFilter.toString(), response);
             String prompt = objectMapper.writeValueAsString(getQuestionPrompt(searchFilter));
-            return ResponseEntity.ok(response.toJson(prompt));
+            String completedString = response.toStringOfAttachmentValues(prompt);
+
+            return ResponseEntity.ok("{\"attachments\":" + completedString + "}");
         } else {
             return ResponseEntity.ok("No listings are found for your search criteria :cry:");
         }
@@ -78,11 +80,12 @@ class SearchController {
 
         SlackMarkdownListResponse response = this.cache.get(searchFilter.toString());
         if (response == null) {
-            return ResponseEntity.ok(new SlackMarkdownListResponse());
+            return ResponseEntity.ok("");
         } else {
             this.cache.remove(searchFilter.toString());
         }
-        return ResponseEntity.ok(response.toJson(""));
+        String completedString = response.toStringOfAttachmentValues("");
+        return ResponseEntity.ok("{\"attachments\":" + completedString + "}");
     }
 
     private QuestionPromptToSaveSearch getQuestionPrompt(SearchFilter filter) throws JsonProcessingException {
