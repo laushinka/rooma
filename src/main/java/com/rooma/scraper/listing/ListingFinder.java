@@ -41,12 +41,11 @@ public class ListingFinder {
 
     private void processFiltersFound(List<SearchFilter> filtersFound) throws UnirestException, JsonProcessingException {
         for (SearchFilter filter : filtersFound) {
-            LOGGER.info("Saved filter {}", filter);
             List<Listing> newResults = getFilterResults(filter);
             if (newResults != null && newResults.size() > 0) {
                 String attachment = processFilterResultsAndConvertToAcceptedFormat(newResults);
                 if (attachment != null) {
-                    sendToSlack(attachment);
+                    sendToSlack(attachment, filter.getSlackUserId());
                     LOGGER.info("Sent to Slack {} number of new results", newResults.size());
                 }
             } else {
@@ -79,11 +78,11 @@ public class ListingFinder {
         return attachmentValue;
     }
 
-    private void sendToSlack(String attachment) throws UnirestException {
+    private void sendToSlack(String attachment, String slackUserId) throws UnirestException {
         Unirest.post("https://slack.com/api/chat.postMessage")
                 .header("accept", "application/json")
                 .queryString("token", "xoxp-512569703077-512200350292-528746738721-ad8bd5686dbda6adb3c24e453af061b0")
-                .queryString("channel", "UF25WAA8L")
+                .queryString("channel", slackUserId)
                 .queryString("text", "This is what we found for your search:")
                 .queryString("attachments", attachment)
                 .queryString("pretty", "1")
