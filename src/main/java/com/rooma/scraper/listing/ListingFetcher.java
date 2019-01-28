@@ -1,7 +1,7 @@
 package com.rooma.scraper.listing;
 
-import com.rooma.scraper.source.SourceService;
 import com.rooma.scraper.source.SourceFactory;
+import com.rooma.scraper.source.SourceService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +16,50 @@ class ListingFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ListingFetcher.class);
     private ListingRepository listingRepository;
 
-    @Scheduled(initialDelay = 2000, fixedDelay = 10000000)
+    @Scheduled(initialDelay = 2000, fixedDelay = 300000)
     void fetchListingsJob() {
-        List<Listing> craigslistListings = startFetching();
+        int saved = 0;
+        int deleted = 0;
+        List<Listing> fetchedFromCraigslist = startFetching();
 
-        for (Listing listing : craigslistListings) {
-            saveNewListings(listing);
+        List<Listing> fromDatabase = listingRepository.findAll();
+        boolean nothingIsInDatabase = fromDatabase.size() == 0;
+
+        // If nothing is in the database, fetch and persist everything
+        if (nothingIsInDatabase) {
+            for (Listing listing : fetchedFromCraigslist) {
+                saveNewListings(listing);
+            }
+            LOGGER.info("Saving into empty database");
+        } else {
+            for (Listing listing : fetchedFromCraigslist) {
+                String listingUrlFromCraigslist = listing.getUrl();
+                boolean listingAlreadyExistsInDatabase = listingRepository.findAllByUrl(listingUrlFromCraigslist) != null;
+                // If url from Craigslist exists in the database, do nothing
+                if (listingAlreadyExistsInDatabase) {
+                    return;
+                } else {
+                    listingRepository.save(listing);
+                    saved++;
+                }
+            }
+            LOGGER.info("Saved {} new listings", saved);
         }
-        LOGGER.info("Saved {} listings", craigslistListings.size());
+
+        // If url from database doesn't exist anymore on Craigslist, delete the entry from the database
+        if (fromDatabase.size() > 0 && fromDatabase.size() > fetchedFromCraigslist.size()) {
+            for (Listing listing : fromDatabase) {
+                for (Listing fromCraigslist : fetchedFromCraigslist) {
+                    if (listing.getUrl().equals(fromCraigslist.getUrl())) {
+                        return;
+                    } else {
+                        listingRepository.deleteBy(listing.getId());
+                        deleted++;
+                    }
+                }
+            }
+        }
+        LOGGER.info("Deleted {} old listings from database", deleted);
     }
 
     private void saveNewListings(Listing listing) {
@@ -38,10 +74,5 @@ class ListingFetcher {
         SourceService craigslistJob = SourceFactory.create("craigslist");
         LOGGER.info("Starting craigslist scheduled job");
         return craigslistJob.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");
-    }
-
-    private void deleteAllRows() {
-        listingRepository.deleteAll();
-        LOGGER.info("Deleted all rows in craigslist table");
     }
 }

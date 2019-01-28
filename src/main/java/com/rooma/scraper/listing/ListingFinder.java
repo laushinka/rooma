@@ -22,17 +22,16 @@ public class ListingFinder {
     private ListingRepository listingRepository;
     private SearchFilterRepository searchFilterRepository;
 
-    @Scheduled(initialDelay = 5000, fixedDelay = 120000)
+    @Scheduled(initialDelay = 5000, fixedDelay = 300000)
     void notificationJob() {
         try {
-            handleNotificationJob();
-            LOGGER.info("Found listings {}");
+            processExistingFilters();
         } catch (Exception e) {
             LOGGER.info("Exception from possibly too large content {}", e.getMessage());
         }
     }
 
-    private void handleNotificationJob() throws UnirestException, JsonProcessingException {
+    private void processExistingFilters() throws UnirestException, JsonProcessingException {
         List<SearchFilter> filtersFound = searchFilterRepository.findAll();
         if (filtersFound.size() > 0) {
             processFiltersFound(filtersFound);
@@ -60,7 +59,7 @@ public class ListingFinder {
                 filter.getDistrict(),
                 filter.getMinNumberOfRooms(),
                 filter.getMinSize(),
-                LocalDateTime.now().minusHours(1)
+                LocalDateTime.now().minusSeconds(290)
         );
     }
 
