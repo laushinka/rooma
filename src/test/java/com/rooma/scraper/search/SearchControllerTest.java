@@ -50,6 +50,7 @@ public class SearchControllerTest {
         ResponseEntity<?> responseEntity = searchController.slackSearch("token=YuQzkOjcW0djDVN9ZtAtVas2&team_id=TF2GRLP29&team_domain=myrooma&channel_id=CF25WGVNG&channel_name=test&user_id=UF25WAA8L&user_name=laurie.malau&command=%2Fwohnung&text=charlottenburg+800+1+40&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FTF2GRLP29%2F534629616229%2FZSNT4TSKdV0ewApbLO6Fgf3m&trigger_id=534426288850.512569703077.244206a5f0b768509cdda2d9613f3a0e");
 
         assertThat(responseEntity.getStatusCode().toString(), is("200 OK"));
+        assertThat(responseEntity.getBody(), is("{\"attachments\":[{\"fallback\":\"\",\"title\":\"Some title\",\"title_link\":\"Some url\",\"fields\":[{\"title\":\"Address\",\"value\":\"Some address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]},{\"fallback\":\"\",\"title\":\"Would you like to save your query?\",\"text\":\"We can send you notifications when there are new apartments :)\",\"callback_id\":\"prompt_question_id\",\"actions\":[{\"name\":\"Save\",\"text\":\"Yes\",\"type\":\"button\",\"value\":\"{\\\"id\\\":null,\\\"minNumberOfRooms\\\":1.0,\\\"maxPrice\\\":800.0,\\\"minSize\\\":40.0,\\\"district\\\":\\\"charlottenburg\\\",\\\"slackUserId\\\":\\\"UF25WAA8L\\\"}\"},{\"name\":\"No save\",\"text\":\"No\",\"type\":\"button\",\"value\":\"Nothing\"}]}]}"));
     }
 
     @Test
