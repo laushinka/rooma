@@ -1,6 +1,7 @@
 package com.rooma.scraper.search;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.rooma.scraper.RentalType;
 import com.rooma.scraper.listing.Listing;
 import com.rooma.scraper.listing.ListingRepository;
@@ -61,7 +62,7 @@ public class SearchControllerTest {
     }
 
     @Test
-    public void respondWithAttachmentWhenSavingSearch() throws IOException {
+    public void respondWithAttachmentWhenSavingSearch() throws IOException, UnirestException {
         when(listingRepository.findBy(anyFloat(), anyString(), anyFloat(), anyFloat())).thenReturn(List.of(Listing.builder()
                 .rentalType(RentalType.APARTMENT)
                 .title("Some title")

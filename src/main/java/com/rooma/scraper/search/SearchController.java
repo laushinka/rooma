@@ -2,13 +2,19 @@ package com.rooma.scraper.search;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.rooma.scraper.listing.Listing;
 import com.rooma.scraper.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,9 +60,9 @@ class SearchController {
         }
 
         if (!response.isEmpty()) {
-            this.cache.put(searchFilter.toString(), response);
+            this.cache.put(searchFilter.sha256(), response);
             String prompt = objectMapper.writeValueAsString(getQuestionPrompt(searchFilter));
-            String completedString = response.toStringOfAttachmentValues(prompt);
+            String completedString = response.toString(prompt);
 
             return ResponseEntity.ok("{\"attachments\":" + completedString + "}");
         } else {
@@ -71,21 +77,28 @@ class SearchController {
             consumes = APPLICATION_FORM_URLENCODED_VALUE
     )
     @ResponseBody
-    ResponseEntity<?> slackSaveSearchRequest(@RequestBody String body) throws IOException {
+    ResponseEntity<?> slackSaveSearchRequest(@RequestBody String body) throws IOException, UnirestException {
         String result = SearchFilter.buildFilterFromSaveRequestPayload(body);
         SearchFilter searchFilter = objectMapper.readValue(result, SearchFilter.class);
 
-        searchFilterRepository.save(searchFilter);
+        SearchFilter a = searchFilterRepository.save(searchFilter);
         logSearchFilter(searchFilter, body);
 
-        SlackMarkdownListResponse response = this.cache.get(searchFilter.toString());
+        SlackMarkdownListResponse response = this.cache.get(a.sha256());
         if (response == null) {
             return ResponseEntity.ok("");
         } else {
             this.cache.remove(searchFilter.toString());
         }
-        String completedString = response.toStringOfAttachmentValues("");
-        return ResponseEntity.ok("{\"attachments\":" + completedString + "}");
+        String completedString = response.toString("");
+
+        String responseUrl = SearchFilter.extractResponseUrl(body);
+
+        Unirest.post(responseUrl)
+                .body("{\"attachments\":" + completedString + "}")
+                .asJson();
+
+        return ResponseEntity.ok("");
     }
 
     private QuestionPromptToSaveSearch getQuestionPrompt(SearchFilter filter) throws JsonProcessingException {
