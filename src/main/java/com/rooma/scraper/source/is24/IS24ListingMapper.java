@@ -27,11 +27,12 @@ public class IS24ListingMapper {
                 .build();
     }
 
-    private Float getNumberOfRooms(Element result) {
+    private Float getNumberOfRooms(Element result) throws ParseException {
         String element = result.getElementsByClass("result-list-entry__criteria").text();
         String roomNumber = StringUtils.substringBetween(element, "Wohnfläche", "Zi");
         if (roomNumber != null) {
-            return Float.valueOf(roomNumber.trim());
+            String formatted = convertToNonGermanNumberFormat(roomNumber.trim());
+            return Float.valueOf(formatted);
         }
         return 1f;
     }
