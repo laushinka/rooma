@@ -20,11 +20,19 @@ public class IS24ListingMapper {
                 .size(getSize(result))
                 .price(getPrice(result))
                 .numberOfRooms(0f)
-                .url("")
+                .url(getUrl(result))
                 .imageUrl("")
                 .source(IS24.NAME)
                 .isAvailable(true)
                 .build();
+    }
+
+    private String getUrl(Element result) {
+        String text = result.getElementsByAttribute("data-go-to-expose-id").attr("data-go-to-expose-id");
+        if (text != null) {
+            return "https://www.immobilienscout24.de/expose/" + text;
+        }
+        return "";
     }
 
     private String getTitle(Element result) {
@@ -45,8 +53,15 @@ private Float getSize(Element result) throws ParseException {
         String element = result.getElementsByClass("result-list-entry__criteria").text();
         String price = StringUtils.substringBefore(element, "€").trim();
         if (!price.equals("")) {
-            String formatted = convertToNonGermanNumberFormat(price);
-            return Float.valueOf(formatted);
+            float v = NumberFormat.getInstance(Locale.GERMAN).parse(price).floatValue();
+            if (v < 1000) {
+                String formatted = NumberFormat.getInstance(new Locale("us")).format(v);
+                return Float.valueOf(formatted);
+            } else {
+                String formatted = NumberFormat.getInstance(new Locale("us")).format(v);
+                String s = formatted.replaceFirst(",", "");
+                return Float.valueOf(s);
+            }
         }
         return 0f;
     }

@@ -15,6 +15,7 @@ public class Craigslist implements SourceService {
     private CraigslistListingMapper mapper = new CraigslistListingMapper();
     public static final String NAME = "craigslist";
 
+    @SuppressWarnings("Duplicates")
     @Override
     public List<Listing> fetch(String url) {
         List<String> listOfPages = new ArrayList<>();

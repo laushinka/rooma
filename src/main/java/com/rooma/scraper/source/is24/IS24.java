@@ -14,7 +14,7 @@ import java.util.List;
 
 public class IS24 implements SourceService{
     private IS24ListingMapper mapper = new IS24ListingMapper();
-    static final String NAME = "immobilienscout";
+    public static final String NAME = "immobilienscout";
 
     @SuppressWarnings("Duplicates")
     @Override
@@ -61,7 +61,7 @@ public class IS24 implements SourceService{
         String firstPage = "https://www.immobilienscout24.de/Suche/S-T/Wohnung-Miete/Berlin/Berlin";
         listOfPages.add(firstPage);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             Document firstDoc = Jsoup.connect(listOfPages.get(listOfPages.size() - 1)).get();
             String nextPage = firstDoc.select("a:contains(nächste Seite)").attr("href");
             if (!nextPage.equals("")) {
