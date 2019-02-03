@@ -46,4 +46,13 @@ public class IS24ListingMapperTest {
 
         assertThat(listing.getDistrict(), is("Mitte"));
     }
+
+    @Test
+    public void mapsSizeAndPrice() {
+        Element element = Jsoup.parse("<div class=result-list-entry__criteria margin-bottom-s><div><div class=grid grid-flex gutter-horizontal-l gutter-vertical-s data-is24-qa=attributes><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs>695 €</dd><dt class=font-s onlyLarge>Kaltmiete</dt></dl><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs>38 m²</dd><dt class=font-s onlyLarge>Wohnfläche</dt></dl><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs><span><span class=onlySmall>1<!-- --> Zi.</span><span class=onlyLarge>1</span></span></dd><dt class=font-s onlyLarge><abbr title=Zimmer>Zi.</abbr></dt></dl></div><div class=result-list-entry__secondary-criteria-container font-s margin-top-s ><ul class=result-list-entry__secondary-criteria role=presentation><li class=margin-top-none margin-bottom-xs>Einbauküche</li><li class=margin-top-none margin-bottom-xs>Aufzug</li></ul></div></div></div>");
+
+        Listing listing = mapper.buildDto(element);
+
+        assertThat(listing.getSize(), is(38f));
+    }
 }

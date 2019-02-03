@@ -2,6 +2,7 @@ package com.rooma.scraper.source.is24;
 
 import com.rooma.scraper.RentalType;
 import com.rooma.scraper.listing.Listing;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 
 public class IS24ListingMapper {
@@ -12,7 +13,7 @@ public class IS24ListingMapper {
                 .district(getDistrict(result))
                 .address(getAddress(result))
                 .postcode("")
-                .size(0f)
+                .size(getSize(result))
                 .price(0f)
                 .numberOfRooms(0f)
                 .url("")
@@ -25,11 +26,15 @@ public class IS24ListingMapper {
     private String getTitle(Element result) {
         return result.getElementsByClass("result-list-entry__brand-title").text();
     }
-//
-//    private float getSize(Element result) {
-//        Element element = result.getElementsByAttribute("result-list-entry__criteria.margin-bottom-s > div > div.grid.grid-flex.gutter-horizontal-l.gutter-vertical-s > dl:nth-child(2) > dd").get(0);
-//        return Float.parseFloat(String.valueOf(element));
-//    }
+
+private Float getSize(Element result) {
+    String element = result.getElementsByClass("result-list-entry__criteria").text();
+    String size = StringUtils.substringBetween(element, "Kaltmiete ", " m");
+    if (size != null) {
+        return Float.valueOf(size);
+    }
+    return 0f;
+}
 
     private String getAddress(Element result) {
         String text = result.getElementsByClass("result-list-entry__address").text();

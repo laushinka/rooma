@@ -38,7 +38,7 @@ public class IS24 implements SourceService{
 
     private void processDocuments(List<Document> listOfDocuments, List<Listing> listingList) {
         for (Document doc : listOfDocuments) {
-            Elements listOfResults = doc.select(".result-list-entry.result-list-entry--xl.resultlist.result_entry_xl.result-list-entry--with-logo");
+            Elements listOfResults = doc.select(".result-list__listing");
             for (Element result : listOfResults) {
                 Listing listing = mapper.buildDto(result);
                 listingList.add(listing);
