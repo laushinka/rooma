@@ -16,7 +16,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -115,24 +114,18 @@ public class SearchFilter {
         return decoded;
     }
 
-    static String buildFilterFromSaveRequestPayload(String body) throws UnsupportedEncodingException {
-        String withoutPayloadText = StringUtils.substringAfter(body, "payload=");
-        String decodedResponse = URLDecoder.decode(withoutPayloadText, "UTF-8");
+    static String buildFilterFromSaveRequestPayload(String decodedResponse) throws UnsupportedEncodingException {
         String searchFiltervalue = StringUtils.substringBetween(decodedResponse, "\"value\":\"", "\"}],\"callback_id\"");
         String responseUrl = StringUtils.substringBetween(decodedResponse, "response_url\":\"", "\"");
         return searchFiltervalue.replaceAll("\\\\", "");
     }
 
-    static boolean doNotSaveSearchFilter(String body) throws UnsupportedEncodingException {
-        String withoutPayloadText = StringUtils.substringAfter(body, "payload=");
-        String decodedResponse = URLDecoder.decode(withoutPayloadText, "UTF-8");
+    static boolean doNotSaveSearchFilter(String decodedResponse) throws UnsupportedEncodingException {
         String userChoice = StringUtils.substringBetween(decodedResponse, "\"name\":\"", "\",\"type\"");
         return userChoice.equals("No save");
     }
 
-    static String extractResponseUrl(String body) throws UnsupportedEncodingException {
-        String withoutPayloadText = StringUtils.substringAfter(body, "payload=");
-        String decodedResponse = URLDecoder.decode(withoutPayloadText, "UTF-8");
+    static String extractResponseUrl(String decodedResponse) throws UnsupportedEncodingException {
         String responseUrl = StringUtils.substringBetween(decodedResponse, "response_url\":\"", "\"");
         return responseUrl.replaceAll("\\\\", "");
     }

@@ -81,31 +81,38 @@ class SearchController {
     )
     @ResponseBody
     ResponseEntity<?> slackSaveSearchRequest(@RequestBody String body) throws IOException, UnirestException {
-        String result = SearchFilter.buildFilterFromSaveRequestPayload(body);
+        String withoutPayloadText = StringUtils.substringAfter(body, "payload=");
+        String decodedResponse = URLDecoder.decode(withoutPayloadText, "UTF-8");
+
+        String result = SearchFilter.buildFilterFromSaveRequestPayload(decodedResponse);
         SearchFilter searchFilter = objectMapper.readValue(result, SearchFilter.class);
 
         convertUnicodeDistrictToUtf8(body, searchFilter);
 
         SearchFilter a = searchFilterRepository.save(searchFilter);
+
         logSearchFilter(searchFilter, body);
 
         SlackMarkdownListResponse response = this.cache.get(a.sha256());
+
         if (response == null) {
             return ResponseEntity.ok("");
         } else {
             this.cache.remove(searchFilter.toString());
         }
+
         String completedString = response.toString("");
 
-        String responseUrl = SearchFilter.extractResponseUrl(body);
+        String responseUrl = SearchFilter.extractResponseUrl(decodedResponse);
 
         Unirest.post(responseUrl)
                 .body("{\"attachments\":" + completedString + "}")
                 .asJson();
 
-        if (SearchFilter.doNotSaveSearchFilter(body)) {
+        if (SearchFilter.doNotSaveSearchFilter(decodedResponse)) {
             searchFilterRepository.deleteBy(searchFilter.getId());
         }
+
         return ResponseEntity.ok("");
     }
 
