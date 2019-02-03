@@ -7,6 +7,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.rooma.scraper.listing.Listing;
 import com.rooma.scraper.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,29 +80,35 @@ class SearchController {
     )
     @ResponseBody
     ResponseEntity<?> slackSaveSearchRequest(@RequestBody String body) throws IOException, UnirestException {
-        String result = SearchFilter.buildFilterFromSaveRequestPayload(body);
-        SearchFilter searchFilter = objectMapper.readValue(result, SearchFilter.class);
+        String withoutPayloadText = StringUtils.substringAfter(body, "payload=");
+        String decodedResponse = URLDecoder.decode(withoutPayloadText, "UTF-8");
 
+        String result = SearchFilter.buildFilterFromSaveRequestPayload(decodedResponse);
+        SearchFilter searchFilter = objectMapper.readValue(result, SearchFilter.class);
         SearchFilter a = searchFilterRepository.save(searchFilter);
+
         logSearchFilter(searchFilter, body);
 
         SlackMarkdownListResponse response = this.cache.get(a.sha256());
+
         if (response == null) {
             return ResponseEntity.ok("");
         } else {
             this.cache.remove(searchFilter.toString());
         }
+
         String completedString = response.toString("");
 
-        String responseUrl = SearchFilter.extractResponseUrl(body);
+        String responseUrl = SearchFilter.extractResponseUrl(decodedResponse);
 
         Unirest.post(responseUrl)
                 .body("{\"attachments\":" + completedString + "}")
                 .asJson();
 
-        if (SearchFilter.doNotSaveSearchFilter(body)) {
+        if (SearchFilter.doNotSaveSearchFilter(decodedResponse)) {
             searchFilterRepository.deleteBy(searchFilter.getId());
         }
+
         return ResponseEntity.ok("");
     }
 
