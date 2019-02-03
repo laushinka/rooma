@@ -98,6 +98,9 @@ class SearchController {
                 .body("{\"attachments\":" + completedString + "}")
                 .asJson();
 
+        if (SearchFilter.doNotSaveSearchFilter(body)) {
+            searchFilterRepository.deleteBy(searchFilter.getId());
+        }
         return ResponseEntity.ok("");
     }
 
@@ -125,7 +128,7 @@ class SearchController {
                 .name("No save")
                 .text("No")
                 .type("button")
-                .value("Nothing")
+                .value(objectMapper.writeValueAsString(filter))
                 .build();
 
         slackActions.add(saveAction);

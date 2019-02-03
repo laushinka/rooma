@@ -8,7 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @AllArgsConstructor
@@ -16,7 +19,7 @@ class ListingFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ListingFetcher.class);
     private ListingRepository listingRepository;
 
-    @Scheduled(initialDelay = 2000, fixedDelay = 300000)
+    @Scheduled(initialDelay = 2000, fixedDelay = 3600000)
     void fetchListingsJob() {
         int saved = 0;
         int deleted = 0;
@@ -67,8 +70,23 @@ class ListingFetcher {
     }
 
     private List<Listing> startFetching() {
+        List<Listing> craigslistListings = fetchFromCraigslist();
+        List<Listing> is24Listings = fetchFromIs24();
+
+        Stream<Listing> combinedStream = Stream.of(craigslistListings, is24Listings).flatMap(Collection::stream);
+
+        return combinedStream.collect(Collectors.toList());
+    }
+
+    private List<Listing> fetchFromIs24() {
+        SourceService is24Job = SourceFactory.create("immobilienscout");
+        LOGGER.info("Starting ImmoScout scheduled job");
+        return is24Job.fetch("https://www.immobilienscout24.de/Suche/S-T/Wohnung-Miete/Berlin/Berlin");
+    }
+
+    private List<Listing> fetchFromCraigslist() {
         SourceService craigslistJob = SourceFactory.create("craigslist");
-        LOGGER.info("Starting craigslist scheduled job");
+        LOGGER.info("Starting Craigslist scheduled job");
         return craigslistJob.fetch("https://berlin.craigslist.de/search/apa?lang=en&cc=gb");
     }
 }

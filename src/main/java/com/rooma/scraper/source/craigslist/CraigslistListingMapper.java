@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import static com.rooma.scraper.helper.BerlinDistricts.convertCommonMisspelling;
 
-public class ListingMapper {
+public class CraigslistListingMapper {
     public Listing buildDto(Element result) {
         return Listing.builder()
                 .rentalType(RentalType.APARTMENT)
@@ -95,6 +95,6 @@ public class ListingMapper {
                 return Float.valueOf(trimSpaces.split("br-")[0]);
             }
         }
-        return (float) 0;
+        return (float) 1;
     }
 }
