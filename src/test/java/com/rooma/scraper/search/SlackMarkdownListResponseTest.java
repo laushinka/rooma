@@ -41,22 +41,15 @@ public class SlackMarkdownListResponseTest {
                 .isAvailable(true)
                 .build();
 
-        SearchFilter filter = SearchFilter.builder()
-                .district("Some district")
-                .maxPrice(800f)
-                .minNumberOfRooms(1f)
-                .minSize(40f)
-                .build();
-
         slackMarkdownListResponse.add(listing);
         slackMarkdownListResponse.add(listing2);
 
-        String expectedResponse = slackMarkdownListResponse.toJson(filter,"");
+        String expectedAttachment = slackMarkdownListResponse.toString("");
 
-        assertThat(expectedResponse, is(getSlackTestData()));
+        assertThat(expectedAttachment, is(getSlackTestData()));
     }
 
     private String getSlackTestData() {
-        return "{\"attachments\":[{\"fallback\":\"\",\"title\":\"Some title\",\"title_link\":null,\"fields\":[{\"title\":\"Address\",\"value\":\"Some address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]},{\"fallback\":\"\",\"title\":\"Other title\",\"title_link\":null,\"fields\":[{\"title\":\"Address\",\"value\":\"Other address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]},{\"fallback\":\"\",\"title\":\"Would you like to save your query?\",\"text\":\"We can send you notifications when there are new apartments :)\",\"callback_id\":\"some_callback_id\",\"actions\":[{\"name\":\"Save\",\"text\":\"Yes\",\"type\":\"button\",\"value\":\"Positive\"},{\"name\":\"No save\",\"text\":\"No\",\"type\":\"button\",\"value\":\"Negative\"}]}]}";
+        return "[{\"fallback\":\"\",\"title\":\"Some title\",\"title_link\":null,\"fields\":[{\"title\":\"Address\",\"value\":\"Some address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]},{\"fallback\":\"\",\"title\":\"Other title\",\"title_link\":null,\"fields\":[{\"title\":\"Address\",\"value\":\"Other address\",\"short\":false},{\"title\":\"Size\",\"value\":\"55.0\",\"short\":true},{\"title\":\"Price\",\"value\":\"700.0\",\"short\":true},{\"title\":\"Number of Rooms\",\"value\":\"2.0\",\"short\":true},{\"title\":\"Source\",\"value\":\"Craigslist\",\"short\":true}]}]";
     }
 }

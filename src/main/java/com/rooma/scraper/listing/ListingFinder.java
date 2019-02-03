@@ -1,13 +1,18 @@
 package com.rooma.scraper.listing;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.rooma.scraper.search.SearchFilter;
 import com.rooma.scraper.search.SearchFilterRepository;
+import com.rooma.scraper.search.SlackMarkdownListResponse;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -17,43 +22,70 @@ public class ListingFinder {
     private ListingRepository listingRepository;
     private SearchFilterRepository searchFilterRepository;
 
-    @Scheduled(initialDelay = 3000, fixedDelay = 1000000000)
-    void loadListingsJob() {
-        List<Listing> results = null;
-        SearchFilter filter = processFilters();
+    @Scheduled(initialDelay = 5000, fixedDelay = 300000)
+    void notificationJob() {
         try {
-            results = getFilterResults(filter);
-            LOGGER.info("Found listings {}", results.size());
+            processExistingFilters();
         } catch (Exception e) {
-            LOGGER.info("Could not load listings {}", e.getMessage());
+            LOGGER.info("Exception from possibly too large content {}", e.getMessage());
         }
+    }
 
-        if (results == null) {
-            LOGGER.info("No listings found");
+    private void processExistingFilters() throws UnirestException, JsonProcessingException {
+        List<SearchFilter> filtersFound = searchFilterRepository.findAll();
+        if (filtersFound.size() > 0) {
+            processFiltersFound(filtersFound);
+        }
+    }
+
+    private void processFiltersFound(List<SearchFilter> filtersFound) throws UnirestException, JsonProcessingException {
+        for (SearchFilter filter : filtersFound) {
+            List<Listing> newResults = getFilterResults(filter);
+            if (newResults != null && newResults.size() > 0) {
+                String attachment = processFilterResultsAndConvertToAcceptedFormat(newResults);
+                if (attachment != null) {
+                    sendToSlack(attachment, filter.getSlackUserId());
+                    LOGGER.info("Sent to Slack {} new results", newResults.size());
+                }
+            } else {
+                LOGGER.info("No new listings yet");
+            }
         }
     }
 
     private List<Listing> getFilterResults(SearchFilter filter) {
-        return listingRepository.findBy(
+        return listingRepository.findNewListingsBy(
                 filter.getMaxPrice(),
                 filter.getDistrict(),
                 filter.getMinNumberOfRooms(),
-                filter.getMinSize());
+                filter.getMinSize(),
+                LocalDateTime.now().minusSeconds(290)
+        );
     }
 
-    private SearchFilter processFilters() {
-        SearchFilter filter = getFilter();
-        searchFilterRepository.save(filter);
-        LOGGER.info("Saved filter {}");
-        return filter;
+    // TODO: extract conversion to another method
+    private String processFilterResultsAndConvertToAcceptedFormat(List<Listing> newResults) throws JsonProcessingException {
+        String attachmentValue;
+        SlackMarkdownListResponse response = new SlackMarkdownListResponse();
+        for(Listing listing : newResults) {
+            response.add(listing);
+        }
+        if (!response.isEmpty()) {
+            attachmentValue = response.toString("");
+        } else {
+            return null;
+        }
+        return attachmentValue;
     }
 
-    private SearchFilter getFilter() {
-        return SearchFilter.builder()
-                .district("mitte")
-                .minNumberOfRooms(2f)
-                .maxPrice(800f)
-                .minSize(40f)
-                .build();
+    private void sendToSlack(String attachment, String slackUserId) throws UnirestException {
+        Unirest.post("https://slack.com/api/chat.postMessage")
+                .header("accept", "application/json")
+                .queryString("token", "xoxp-512569703077-512200350292-528746738721-ad8bd5686dbda6adb3c24e453af061b0")
+                .queryString("channel", slackUserId)
+                .queryString("text", "This is what we found for your search:")
+                .queryString("attachments", attachment)
+                .queryString("pretty", "1")
+                .asJson();
     }
 }
