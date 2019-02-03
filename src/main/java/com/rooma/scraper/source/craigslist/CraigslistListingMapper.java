@@ -95,6 +95,6 @@ public class CraigslistListingMapper {
                 return Float.valueOf(trimSpaces.split("br-")[0]);
             }
         }
-        return (float) 0;
+        return (float) 1;
     }
 }

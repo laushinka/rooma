@@ -19,12 +19,21 @@ public class IS24ListingMapper {
                 .postcode("")
                 .size(getSize(result))
                 .price(getPrice(result))
-                .numberOfRooms(0f)
+                .numberOfRooms(getNumberOfRooms(result))
                 .url(getUrl(result))
                 .imageUrl("")
                 .source(IS24.NAME)
                 .isAvailable(true)
                 .build();
+    }
+
+    private Float getNumberOfRooms(Element result) {
+        String element = result.getElementsByClass("result-list-entry__criteria").text();
+        String roomNumber = StringUtils.substringBetween(element, "Wohnfläche", "Zi");
+        if (roomNumber != null) {
+            return Float.valueOf(roomNumber.trim());
+        }
+        return 1f;
     }
 
     private String getUrl(Element result) {

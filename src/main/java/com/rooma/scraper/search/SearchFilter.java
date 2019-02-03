@@ -9,6 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriUtils;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -87,6 +88,7 @@ public class SearchFilter {
     static SearchFilter buildFilterFromSearchRequestPayload(String body) {
         String payload = StringUtils.substringAfter(body, "text=");
         String district = payload.split("&")[0].split("\\+")[0];
+        district = parseDistrict(district);
         Float price = Float.valueOf(payload.split("&")[0].split("\\+")[1]);
         Float numberOfRooms = Float.valueOf(payload.split("&")[0].split("\\+")[2]);
         Float minSize = Float.valueOf(payload.split("&")[0].split("\\+")[3]);
@@ -101,6 +103,14 @@ public class SearchFilter {
                 .minSize(minSize)
                 .slackUserId(slackUserId)
                 .build();
+    }
+
+    private static String parseDistrict(String district) {
+        String decoded = UriUtils.decode(district, "UTF-8");
+        if (decoded.equals("prenzlauerberg")) {
+            return "prenzlauer berg";
+        }
+        return district;
     }
 
     static String buildFilterFromSaveRequestPayload(String body) throws UnsupportedEncodingException {

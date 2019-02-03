@@ -59,13 +59,14 @@ public class IS24ListingMapperTest {
     }
 
     @Test
-    public void mapsSizeAndPrice() throws ParseException {
+    public void mapsSizeAndPriceAndNumberOfRooms() throws ParseException {
         Element element = Jsoup.parse("<div class=result-list-entry__criteria margin-bottom-s><div><div class=grid grid-flex gutter-horizontal-l gutter-vertical-s data-is24-qa=attributes><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs>1.024,35 €</dd><dt class=font-s onlyLarge>Kaltmiete</dt></dl><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs>42,96 m²</dd><dt class=font-s onlyLarge>Wohnfläche</dt></dl><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs><span><span class=onlySmall>1<!-- --> Zi.</span><span class=onlyLarge>1</span></span></dd><dt class=font-s onlyLarge><abbr title=Zimmer>Zi.</abbr></dt></dl></div><div class=result-list-entry__secondary-criteria-container font-s margin-top-s ><ul class=result-list-entry__secondary-criteria role=presentation><li class=margin-top-none margin-bottom-xs>Einbauküche</li><li class=margin-top-none margin-bottom-xs>Aufzug</li></ul></div></div></div>");
 
         Listing listing = mapper.buildDto(element);
 
         assertThat(listing.getSize(), is(42.96F));
         assertThat(listing.getPrice(), is(1024.35F));
+        assertThat(listing.getNumberOfRooms(), is(1F));
     }
 
     @Test
@@ -74,7 +75,6 @@ public class IS24ListingMapperTest {
 
         Listing listing = mapper.buildDto(element);
 
-        assertThat(listing.getSize(), is(42.96F));
         assertThat(listing.getPrice(), is(9999.999F));
     }
 
