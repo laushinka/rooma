@@ -42,16 +42,35 @@ public class IS24ListingMapperTest {
 
     @Test
     public void mapsDistrictWithOneWord() throws ParseException {
-        Element element = Jsoup.parse("<div class=result-list-entry__address><button title=Auf der Karte anzeigen data-result-id=85827703 class=button-link link-internal result-list-entry__map-link><div class=font-ellipsis>Torstraße 131, Mitte (Mitte), Berlin</div></button></div>");
+        Element element = Jsoup.parse("<div class=result-list-entry__address><button title=Auf der Karte anzeigen data-result-id=85827703 class=button-link link-internal result-list-entry__map-link><div class=font-ellipsis>Torstraße 131, Charlottenburg (Charlottenburg), Berlin</div></button></div>");
 
         Listing listing = mapper.buildDto(element);
 
-        assertThat(listing.getDistrict(), is("Mitte"));
+        assertThat(listing.getDistrict(), is("Charlottenburg"));
+    }
+
+    @Test
+    public void mapsDistrictWithHiddenAddress() throws ParseException {
+        Element element = Jsoup.parse("<div class=result-list-entry__address><button title=Auf der Karte anzeigen data-result-id=85827703 class=button-link link-internal result-list-entry__map-link><div class=font-ellipsis>Charlottenburg (Charlottenburg), Berlin</div></button></div>");
+
+        Listing listing = mapper.buildDto(element);
+
+        assertThat(listing.getDistrict(), is("Charlottenburg"));
     }
 
     @Test
     public void mapsSizeAndPrice() throws ParseException {
-        Element element = Jsoup.parse("<div class=result-list-entry__criteria margin-bottom-s><div><div class=grid grid-flex gutter-horizontal-l gutter-vertical-s data-is24-qa=attributes><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs>9999,999 €</dd><dt class=font-s onlyLarge>Kaltmiete</dt></dl><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs>42,96 m²</dd><dt class=font-s onlyLarge>Wohnfläche</dt></dl><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs><span><span class=onlySmall>1<!-- --> Zi.</span><span class=onlyLarge>1</span></span></dd><dt class=font-s onlyLarge><abbr title=Zimmer>Zi.</abbr></dt></dl></div><div class=result-list-entry__secondary-criteria-container font-s margin-top-s ><ul class=result-list-entry__secondary-criteria role=presentation><li class=margin-top-none margin-bottom-xs>Einbauküche</li><li class=margin-top-none margin-bottom-xs>Aufzug</li></ul></div></div></div>");
+        Element element = Jsoup.parse("<div class=result-list-entry__criteria margin-bottom-s><div><div class=grid grid-flex gutter-horizontal-l gutter-vertical-s data-is24-qa=attributes><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs>1.024,35 €</dd><dt class=font-s onlyLarge>Kaltmiete</dt></dl><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs>42,96 m²</dd><dt class=font-s onlyLarge>Wohnfläche</dt></dl><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs><span><span class=onlySmall>1<!-- --> Zi.</span><span class=onlyLarge>1</span></span></dd><dt class=font-s onlyLarge><abbr title=Zimmer>Zi.</abbr></dt></dl></div><div class=result-list-entry__secondary-criteria-container font-s margin-top-s ><ul class=result-list-entry__secondary-criteria role=presentation><li class=margin-top-none margin-bottom-xs>Einbauküche</li><li class=margin-top-none margin-bottom-xs>Aufzug</li></ul></div></div></div>");
+
+        Listing listing = mapper.buildDto(element);
+
+        assertThat(listing.getSize(), is(42.96F));
+        assertThat(listing.getPrice(), is(1024.35F));
+    }
+
+    @Test
+    public void mapsSizeAndPriceWithWeirdNumber() throws ParseException {
+        Element element = Jsoup.parse("<div class=result-list-entry__criteria margin-bottom-s><div><div class=grid grid-flex gutter-horizontal-l gutter-vertical-s data-is24-qa=attributes><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs>9.999,999 €</dd><dt class=font-s onlyLarge>Kaltmiete</dt></dl><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs>42,96 m²</dd><dt class=font-s onlyLarge>Wohnfläche</dt></dl><dl class=grid-item result-list-entry__primary-criterion  role=presentation><dd class=font-nowrap font-line-xs><span><span class=onlySmall>1<!-- --> Zi.</span><span class=onlyLarge>1</span></span></dd><dt class=font-s onlyLarge><abbr title=Zimmer>Zi.</abbr></dt></dl></div><div class=result-list-entry__secondary-criteria-container font-s margin-top-s ><ul class=result-list-entry__secondary-criteria role=presentation><li class=margin-top-none margin-bottom-xs>Einbauküche</li><li class=margin-top-none margin-bottom-xs>Aufzug</li></ul></div></div></div>");
 
         Listing listing = mapper.buildDto(element);
 

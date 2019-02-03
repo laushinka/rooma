@@ -57,7 +57,7 @@ private Float getSize(Element result) throws ParseException {
             if (v < 1000) {
                 String formatted = NumberFormat.getInstance(new Locale("us")).format(v);
                 return Float.valueOf(formatted);
-            } else {
+            } else if (v >= 1000 && v < 9999){ // Not handle the weird 9999,999 exception for now
                 String formatted = NumberFormat.getInstance(new Locale("us")).format(v);
                 String s = formatted.replaceFirst(",", "");
                 return Float.valueOf(s);
@@ -73,11 +73,14 @@ private Float getSize(Element result) throws ParseException {
 
     private String getDistrict(Element result) {
         String text = result.getElementsByClass("result-list-entry__address").text();
-        if (text.length() > 0) {
+        if (text.length() > 0 && text.split(",").length > 2) {
             String districtText = text.split(",")[1];
             if (districtText.length() > 1 && districtText.split("\\(").length > 1) {
                 return districtText.split("\\(")[0].trim();
             }
+        } else {
+            String[] splitDistrict = text.split("\\(");
+            return splitDistrict[0].trim();
         }
         return "";
     }
