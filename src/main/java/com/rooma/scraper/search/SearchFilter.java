@@ -15,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -51,7 +53,35 @@ public class SearchFilter {
                 ", maxPrice=" + maxPrice +
                 ", minSize=" + minSize +
                 ", district='" + district + '\'' +
+                ", slackUserId='" + slackUserId + '\'' +
                 '}';
+    }
+
+    public String sha256() {
+        MessageDigest digest = null;
+
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+            digest.update(String.valueOf(this.minNumberOfRooms).getBytes());
+            digest.update(String.valueOf(this.maxPrice).getBytes());
+            digest.update(String.valueOf(this.minSize).getBytes());
+            digest.update(this.district.getBytes());
+            digest.update(this.slackUserId.getBytes());
+
+            byte[] encodedhash = digest.digest();
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < encodedhash.length; i++) {
+                String hex = Integer.toHexString(0xff & encodedhash[i]);
+                if(hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     static SearchFilter buildFilterFromSearchRequestPayload(String body) {
@@ -74,8 +104,18 @@ public class SearchFilter {
     }
 
     static String buildFilterFromSaveRequestPayload(String body) throws UnsupportedEncodingException {
-        String decodedResponse = URLDecoder.decode(body, "UTF-8");
-        String result = StringUtils.substringBetween(decodedResponse, "\"value\":\"", "\"}],\"callback_id\"");
-        return result.replaceAll("\\\\", "");
+        String withoutPayloadText = StringUtils.substringAfter(body, "payload=");
+        String decodedResponse = URLDecoder.decode(withoutPayloadText, "UTF-8");
+        String searchFiltervalue = StringUtils.substringBetween(decodedResponse, "\"value\":\"", "\"}],\"callback_id\"");
+        String responseUrl = StringUtils.substringBetween(decodedResponse, "response_url\":\"", "\"");
+        return searchFiltervalue.replaceAll("\\\\", "");
     }
+
+    static String extractResponseUrl(String body) throws UnsupportedEncodingException {
+        String withoutPayloadText = StringUtils.substringAfter(body, "payload=");
+        String decodedResponse = URLDecoder.decode(withoutPayloadText, "UTF-8");
+        String responseUrl = StringUtils.substringBetween(decodedResponse, "response_url\":\"", "\"");
+        return responseUrl.replaceAll("\\\\", "");
+    }
+
 }

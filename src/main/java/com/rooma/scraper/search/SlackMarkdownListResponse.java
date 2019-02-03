@@ -12,6 +12,10 @@ public class SlackMarkdownListResponse {
     private ObjectMapper objectMapper = new ObjectMapper();
     private ListingToSearchResultMapper listingMapper = new ListingToSearchResultMapper();
 
+//    TODO
+//    public static SlackMarkdownListResponse createFrom(List<Listing> listing) {
+//
+//    }
     public SlackMarkdownListResponse() {
         this.listings = new ArrayList<>();
     }
@@ -24,7 +28,7 @@ public class SlackMarkdownListResponse {
         return this.listings.size() == 0;
     }
 
-    public String toStringOfAttachmentValues(String prompt) throws JsonProcessingException {
+    public String toString(String prompt) throws JsonProcessingException {
         List<SearchResult> searchResultList = new ArrayList<>();
 
         for (Listing listing : this.listings) {

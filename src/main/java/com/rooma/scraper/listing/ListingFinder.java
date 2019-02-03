@@ -63,6 +63,7 @@ public class ListingFinder {
         );
     }
 
+    // TODO: extract conversion to another method
     private String processFilterResultsAndConvertToAcceptedFormat(List<Listing> newResults) throws JsonProcessingException {
         String attachmentValue;
         SlackMarkdownListResponse response = new SlackMarkdownListResponse();
@@ -70,7 +71,7 @@ public class ListingFinder {
             response.add(listing);
         }
         if (!response.isEmpty()) {
-            attachmentValue = response.toStringOfAttachmentValues("");
+            attachmentValue = response.toString("");
         } else {
             return null;
         }

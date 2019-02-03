@@ -35,10 +35,8 @@ class ListingFetcher {
             for (Listing listing : fetchedFromCraigslist) {
                 String listingUrlFromCraigslist = listing.getUrl();
                 boolean listingAlreadyExistsInDatabase = listingRepository.findAllByUrl(listingUrlFromCraigslist) != null;
-                // If url from Craigslist exists in the database, do nothing
-                if (listingAlreadyExistsInDatabase) {
-                    return;
-                } else {
+                // If url from Craigslist does not exist yet in the database, persist it
+                if (!listingAlreadyExistsInDatabase) {
                     listingRepository.save(listing);
                     saved++;
                 }
@@ -47,12 +45,10 @@ class ListingFetcher {
         }
 
         // If url from database doesn't exist anymore on Craigslist, delete the entry from the database
-        if (fromDatabase.size() > 0 && fromDatabase.size() > fetchedFromCraigslist.size()) {
+        if (fromDatabase.size() > 0 && fromDatabase.size() != fetchedFromCraigslist.size()) {
             for (Listing listing : fromDatabase) {
                 for (Listing fromCraigslist : fetchedFromCraigslist) {
-                    if (listing.getUrl().equals(fromCraigslist.getUrl())) {
-                        return;
-                    } else {
+                    if (!listing.getUrl().equals(fromCraigslist.getUrl())) {
                         listingRepository.deleteBy(listing.getId());
                         deleted++;
                     }
