@@ -5,8 +5,12 @@ import com.rooma.scraper.listing.Listing;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
+
 public class IS24ListingMapper {
-    public Listing buildDto(Element result) {
+    public Listing buildDto(Element result) throws ParseException {
         return Listing.builder()
                 .rentalType(RentalType.APARTMENT)
                 .title(getTitle(result))
@@ -14,7 +18,7 @@ public class IS24ListingMapper {
                 .address(getAddress(result))
                 .postcode("")
                 .size(getSize(result))
-                .price(0f)
+                .price(getPrice(result))
                 .numberOfRooms(0f)
                 .url("")
                 .imageUrl("")
@@ -27,14 +31,25 @@ public class IS24ListingMapper {
         return result.getElementsByClass("result-list-entry__brand-title").text();
     }
 
-private Float getSize(Element result) {
+private Float getSize(Element result) throws ParseException {
     String element = result.getElementsByClass("result-list-entry__criteria").text();
     String size = StringUtils.substringBetween(element, "Kaltmiete ", " m");
     if (size != null) {
-        return Float.valueOf(size);
+        String formatted = convertToNonGermanNumberFormat(size);
+        return Float.valueOf(formatted);
     }
     return 0f;
 }
+
+    private Float getPrice(Element result) throws ParseException {
+        String element = result.getElementsByClass("result-list-entry__criteria").text();
+        String price = StringUtils.substringBefore(element, "€").trim();
+        if (!price.equals("")) {
+            String formatted = convertToNonGermanNumberFormat(price);
+            return Float.valueOf(formatted);
+        }
+        return 0f;
+    }
 
     private String getAddress(Element result) {
         String text = result.getElementsByClass("result-list-entry__address").text();
@@ -50,5 +65,10 @@ private Float getSize(Element result) {
             }
         }
         return "";
+    }
+
+    private String convertToNonGermanNumberFormat(String size) throws ParseException {
+        float v = NumberFormat.getInstance(Locale.GERMAN).parse(size).floatValue();
+        return NumberFormat.getInstance(new Locale("us")).format(v);
     }
 }

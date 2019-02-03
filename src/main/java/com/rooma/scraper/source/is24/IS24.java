@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,12 +32,16 @@ public class IS24 implements SourceService{
             e.printStackTrace();
         }
 
-        processDocuments(listOfDocuments, listingList);
+        try {
+            processDocuments(listOfDocuments, listingList);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         return listingList;
     }
 
-    private void processDocuments(List<Document> listOfDocuments, List<Listing> listingList) {
+    private void processDocuments(List<Document> listOfDocuments, List<Listing> listingList) throws ParseException {
         for (Document doc : listOfDocuments) {
             Elements listOfResults = doc.select(".result-list__listing");
             for (Element result : listOfResults) {
