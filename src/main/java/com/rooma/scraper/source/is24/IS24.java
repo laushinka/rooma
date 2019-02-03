@@ -61,7 +61,7 @@ public class IS24 implements SourceService{
         String firstPage = "https://www.immobilienscout24.de/Suche/S-T/Wohnung-Miete/Berlin/Berlin";
         listOfPages.add(firstPage);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 30; i++) {
             Document firstDoc = Jsoup.connect(listOfPages.get(listOfPages.size() - 1)).get();
             String nextPage = firstDoc.select("a:contains(nächste Seite)").attr("href");
             if (!nextPage.equals("")) {

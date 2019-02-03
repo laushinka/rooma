@@ -87,8 +87,7 @@ public class SearchFilter {
 
     static SearchFilter buildFilterFromSearchRequestPayload(String body) {
         String payload = StringUtils.substringAfter(body, "text=");
-        String district = payload.split("&")[0].split("\\+")[0];
-        district = parseDistrict(district);
+        String district = parseDistrict(payload);
         Float price = Float.valueOf(payload.split("&")[0].split("\\+")[1]);
         Float numberOfRooms = Float.valueOf(payload.split("&")[0].split("\\+")[2]);
         Float minSize = Float.valueOf(payload.split("&")[0].split("\\+")[3]);
@@ -105,12 +104,13 @@ public class SearchFilter {
                 .build();
     }
 
-    private static String parseDistrict(String district) {
+    private static String parseDistrict(String payload) {
+        String district = payload.split("&")[0].split("\\+")[0];
         String decoded = UriUtils.decode(district, "UTF-8");
         if (decoded.equals("prenzlauerberg")) {
             return "prenzlauer berg";
         }
-        return district;
+        return decoded;
     }
 
     static String buildFilterFromSaveRequestPayload(String body) throws UnsupportedEncodingException {
@@ -121,11 +121,17 @@ public class SearchFilter {
         return searchFiltervalue.replaceAll("\\\\", "");
     }
 
+    static boolean doNotSaveSearchFilter(String body) throws UnsupportedEncodingException {
+        String withoutPayloadText = StringUtils.substringAfter(body, "payload=");
+        String decodedResponse = URLDecoder.decode(withoutPayloadText, "UTF-8");
+        String userChoice = StringUtils.substringBetween(decodedResponse, "\"name\":\"", "\",\"type\"");
+        return userChoice.equals("No save");
+    }
+
     static String extractResponseUrl(String body) throws UnsupportedEncodingException {
         String withoutPayloadText = StringUtils.substringAfter(body, "payload=");
         String decodedResponse = URLDecoder.decode(withoutPayloadText, "UTF-8");
         String responseUrl = StringUtils.substringBetween(decodedResponse, "response_url\":\"", "\"");
         return responseUrl.replaceAll("\\\\", "");
     }
-
 }
