@@ -1,8 +1,10 @@
-package com.rooma.scraper.listing;
+package com.rooma.scraper.notification;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.rooma.scraper.listing.Listing;
+import com.rooma.scraper.listing.ListingRepository;
 import com.rooma.scraper.search.SearchFilter;
 import com.rooma.scraper.search.SearchFilterRepository;
 import com.rooma.scraper.search.SlackMarkdownListResponse;
@@ -17,43 +19,40 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class ListingFinder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ListingFinder.class);
+public class NotificationService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationService.class);
     private ListingRepository listingRepository;
     private SearchFilterRepository searchFilterRepository;
 
     @Scheduled(initialDelay = 5000, fixedDelay = 300000)
     void notificationJob() {
         try {
-            processExistingFilters();
+            processSavedFilters();
         } catch (Exception e) {
             LOGGER.info("Exception from possibly too large content {}", e.getMessage());
         }
     }
 
-    private void processExistingFilters() throws UnirestException, JsonProcessingException {
+    private void processSavedFilters() throws UnirestException, JsonProcessingException {
         List<SearchFilter> filtersFound = searchFilterRepository.findAll();
         if (filtersFound.size() > 0) {
-            processFiltersFound(filtersFound);
-        }
-    }
-
-    private void processFiltersFound(List<SearchFilter> filtersFound) throws UnirestException, JsonProcessingException {
-        for (SearchFilter filter : filtersFound) {
-            List<Listing> newResults = getFilterResults(filter);
-            if (newResults != null && newResults.size() > 0) {
-                String attachment = processFilterResultsAndConvertToAcceptedFormat(newResults);
-                if (attachment != null) {
-                    sendToSlack(attachment, filter.getSlackUserId());
-                    LOGGER.info("Sent to Slack {} new results", newResults.size());
+            for (SearchFilter filter : filtersFound) {
+                List<Listing> newResults = findListingsBasedOn(filter);
+                if (newResults != null && newResults.size() > 0) {
+                    String attachment = convertToAcceptedFormat(newResults);
+                    if (attachment != null) {
+                        sendToSlack(attachment, filter.getSlackUserId());
+                        LOGGER.info("Sent to Slack {} new results", newResults.size());
+                    }
+                } else {
+                    LOGGER.info("No new listings yet");
                 }
-            } else {
-                LOGGER.info("No new listings yet");
             }
         }
+
     }
 
-    private List<Listing> getFilterResults(SearchFilter filter) {
+    private List<Listing> findListingsBasedOn(SearchFilter filter) {
         return listingRepository.findNewListingsBy(
                 filter.getMaxPrice(),
                 filter.getDistrict(),
@@ -63,8 +62,7 @@ public class ListingFinder {
         );
     }
 
-    // TODO: extract conversion to another method
-    private String processFilterResultsAndConvertToAcceptedFormat(List<Listing> newResults) throws JsonProcessingException {
+    private String convertToAcceptedFormat(List<Listing> newResults) throws JsonProcessingException {
         String attachmentValue;
         SlackMarkdownListResponse response = new SlackMarkdownListResponse();
         for(Listing listing : newResults) {
