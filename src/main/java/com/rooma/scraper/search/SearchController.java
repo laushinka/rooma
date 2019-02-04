@@ -7,6 +7,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.rooma.scraper.listing.Listing;
 import com.rooma.scraper.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +84,8 @@ class SearchController {
         String result = SearchFilter.buildFilterFromSaveRequestPayload(body);
         SearchFilter searchFilter = objectMapper.readValue(result, SearchFilter.class);
 
+        convertUnicodeDistrictToUtf8(body, searchFilter);
+
         SearchFilter a = searchFilterRepository.save(searchFilter);
         logSearchFilter(searchFilter, body);
 
@@ -102,6 +107,15 @@ class SearchController {
             searchFilterRepository.deleteBy(searchFilter.getId());
         }
         return ResponseEntity.ok("");
+    }
+
+    private void convertUnicodeDistrictToUtf8(@RequestBody String body, SearchFilter searchFilter) throws UnsupportedEncodingException {
+        String district = StringUtils.substringBetween(body, "district%5C%22%3A%5C%22", "%5C%22%2C%5C%22slackUserId");
+        String decodedDistrict = URLDecoder.decode(district, "UTF-8");
+        byte[] utf8 = decodedDistrict.getBytes("UTF-8");
+        String s = new String(utf8, "UTF-8");
+
+        searchFilter.setDistrict(s);
     }
 
     private QuestionPromptToSaveSearch getQuestionPrompt(SearchFilter filter) throws JsonProcessingException {

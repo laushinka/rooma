@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -24,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
 @Entity
 @Builder
 @Getter
+@Setter
 public class SearchFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchFilter.class);
 
