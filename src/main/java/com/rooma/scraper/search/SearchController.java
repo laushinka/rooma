@@ -112,10 +112,9 @@ class SearchController {
     private void convertUnicodeDistrictToUtf8(@RequestBody String body, SearchFilter searchFilter) throws UnsupportedEncodingException {
         String district = StringUtils.substringBetween(body, "district%5C%22%3A%5C%22", "%5C%22%2C%5C%22slackUserId");
         String decodedDistrict = URLDecoder.decode(district, "UTF-8");
-        byte[] utf8 = decodedDistrict.getBytes("UTF-8");
-        String s = new String(utf8, "UTF-8");
+        String finalDecodedDistrict = Utils.decodeStr(decodedDistrict);
 
-        searchFilter.setDistrict(s);
+        searchFilter.setDistrict(finalDecodedDistrict);
     }
 
     private QuestionPromptToSaveSearch getQuestionPrompt(SearchFilter filter) throws JsonProcessingException {
