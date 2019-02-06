@@ -7,7 +7,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class SearchResult {
+class SearchResult {
     private String fallback;
     private String title;
     private String title_link;

@@ -14,6 +14,7 @@ import java.util.List;
 public class Craigslist implements SourceService {
     private CraigslistListingMapper mapper = new CraigslistListingMapper();
     public static final String NAME = "craigslist";
+    private static final String DOMAIN_NAME = "https://berlin.craigslist.de";
 
     @SuppressWarnings("Duplicates")
     @Override
@@ -52,15 +53,14 @@ public class Craigslist implements SourceService {
     }
 
     private List<String> getUrls(List<String> listOfPages) throws IOException {
-        String hostName = "https://berlin.craigslist.de";
-        String firstPage = "https://berlin.craigslist.de/search/apa?lang=en&cc=gb";
+        String firstPage = DOMAIN_NAME + "/search/apa?lang=en&cc=gb";
         listOfPages.add(firstPage);
 
         for (int i = 0; i < 5; i++) {
             Document firstDoc = Jsoup.connect(listOfPages.get(listOfPages.size() - 1)).get();
             String nextPage = firstDoc.select("a.button.next").attr("href");
             if (!nextPage.equals("")) {
-                String nextUrl = hostName + nextPage;
+                String nextUrl = DOMAIN_NAME + nextPage;
                 listOfPages.add(nextUrl);
             }
         }

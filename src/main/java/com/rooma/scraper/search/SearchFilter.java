@@ -29,7 +29,7 @@ public class SearchFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchFilter.class);
 
     @Id
-    @GeneratedValue(generator="sequence-generator")
+    @GeneratedValue(generator = "sequence-generator")
     @GenericGenerator(
             name = "sequence-generator",
             strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
@@ -60,7 +60,7 @@ public class SearchFilter {
     }
 
     public String sha256() {
-        MessageDigest digest = null;
+        MessageDigest digest;
 
         try {
             digest = MessageDigest.getInstance("SHA-256");
@@ -74,7 +74,7 @@ public class SearchFilter {
             StringBuffer hexString = new StringBuffer();
             for (int i = 0; i < encodedhash.length; i++) {
                 String hex = Integer.toHexString(0xff & encodedhash[i]);
-                if(hex.length() == 1) hexString.append('0');
+                if (hex.length() == 1) hexString.append('0');
                 hexString.append(hex);
             }
             return hexString.toString();
@@ -108,15 +108,19 @@ public class SearchFilter {
     private static String parseDistrict(String payload) {
         String district = payload.split("&")[0].split("\\+")[0];
         String decoded = UriUtils.decode(district, "UTF-8");
-        if (decoded.equals("prenzlauerberg")) {
-            return "prenzlauer berg";
+
+        switch (decoded) {
+            case "prenzlauerberg":
+                return "prenzlauer berg";
+            case "französischbuchholz":
+                return "französisch buchholz";
+            default:
+                return decoded;
         }
-        return decoded;
     }
 
     static String buildFilterFromSaveRequestPayload(String decodedResponse) throws UnsupportedEncodingException {
         String searchFiltervalue = StringUtils.substringBetween(decodedResponse, "\"value\":\"", "\"}],\"callback_id\"");
-        String responseUrl = StringUtils.substringBetween(decodedResponse, "response_url\":\"", "\"");
         return searchFiltervalue.replaceAll("\\\\", "");
     }
 

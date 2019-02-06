@@ -7,7 +7,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class QuestionPromptToSaveSearch {
+class QuestionPromptToSaveSearch {
     private String fallback;
     private String title;
     private String text;

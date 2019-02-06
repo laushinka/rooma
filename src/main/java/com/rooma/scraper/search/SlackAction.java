@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class SlackAction {
+class SlackAction {
     private String name;
     private String text;
     private String type;

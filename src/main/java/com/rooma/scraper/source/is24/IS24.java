@@ -13,8 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IS24 implements SourceService{
-    private IS24ListingMapper mapper = new IS24ListingMapper();
+    private static final String DOMAIN_NAME = "https://www.immobilienscout24.de";
     public static final String NAME = "immobilienscout";
+    private IS24ListingMapper mapper = new IS24ListingMapper();
 
     @SuppressWarnings("Duplicates")
     @Override
@@ -57,15 +58,14 @@ public class IS24 implements SourceService{
     }
 
     private List<String> getUrls(List<String> listOfPages) throws IOException {
-        String hostName = "https://www.immobilienscout24.de";
-        String firstPage = "https://www.immobilienscout24.de/Suche/S-T/Wohnung-Miete/Berlin/Berlin";
+        String firstPage = DOMAIN_NAME + "/Suche/S-T/Wohnung-Miete/Berlin/Berlin";
         listOfPages.add(firstPage);
 
         for (int i = 0; i < 30; i++) {
             Document firstDoc = Jsoup.connect(listOfPages.get(listOfPages.size() - 1)).get();
             String nextPage = firstDoc.select("a:contains(nächste Seite)").attr("href");
             if (!nextPage.equals("")) {
-                String nextUrl = hostName + nextPage;
+                String nextUrl = DOMAIN_NAME + nextPage;
                 listOfPages.add(nextUrl);
             }
         }
