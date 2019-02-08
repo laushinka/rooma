@@ -59,7 +59,7 @@ public class ListingFinder {
                 filter.getDistrict(),
                 filter.getMinNumberOfRooms(),
                 filter.getMinSize(),
-                LocalDateTime.now().minusHours(1)
+                LocalDateTime.now().minusMinutes(58)
         );
     }
 

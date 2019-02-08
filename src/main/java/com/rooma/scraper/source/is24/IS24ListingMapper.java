@@ -67,7 +67,7 @@ private Float getSize(Element result) throws ParseException {
             if (v < 1000) {
                 String formatted = NumberFormat.getInstance(new Locale("us")).format(v);
                 return Float.valueOf(formatted);
-            } else if (v >= 1000 && v < 9999){ // Not handle the weird 9999,999 exception for now
+            } else if (v >= 1000){
                 String formatted = NumberFormat.getInstance(new Locale("us")).format(v);
                 String s = formatted.replaceFirst(",", "");
                 return Float.valueOf(s);
