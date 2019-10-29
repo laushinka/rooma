@@ -1,4 +1,5 @@
 # Rooma
+This application scrapes and returns listings from real estate search platforms such as Craigslist and Immobilien Scout.
 
 # Running locally
 1. Run MySQL container
